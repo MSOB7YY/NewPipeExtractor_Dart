@@ -21,10 +21,9 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 
 public class DownloaderImpl extends Downloader {
-    private static final String USER_AGENT
-            = "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0";
-    public static final String YOUTUBE_RESTRICTED_MODE_COOKIE_KEY
-            = "youtube_restricted_mode_key";
+    private static final String USER_AGENT =
+            "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0";
+    public static final String YOUTUBE_RESTRICTED_MODE_COOKIE_KEY = "youtube_restricted_mode_key";
     public static final String RECAPTCHA_COOKIES_KEY = "recaptcha_cookies";
     public static final String YOUTUBE_DOMAIN = "youtube.com";
     private static DownloaderImpl instance;
@@ -43,8 +42,7 @@ public class DownloaderImpl extends Downloader {
      * @return a new instance of {@link DownloaderImpl}
      */
     public static DownloaderImpl init(@Nullable final OkHttpClient.Builder builder) {
-        instance = new DownloaderImpl(
-                builder != null ? builder : new OkHttpClient.Builder());
+        instance = new DownloaderImpl(builder != null ? builder : new OkHttpClient.Builder());
         return instance;
     }
 
@@ -85,8 +83,7 @@ public class DownloaderImpl extends Downloader {
     }
 
     @Override
-    public Response execute(@Nonnull final Request request)
-            throws IOException, ReCaptchaException {
+    public Response execute(@Nonnull final Request request) throws IOException, ReCaptchaException {
         final String httpMethod = request.httpMethod();
         final String url = request.url();
         final Map<String, List<String>> headers = request.headers();
@@ -98,8 +95,7 @@ public class DownloaderImpl extends Downloader {
         }
 
         final okhttp3.Request.Builder requestBuilder = new okhttp3.Request.Builder()
-                .method(httpMethod, requestBody).url(url)
-                .addHeader("User-Agent", USER_AGENT);
+                .method(httpMethod, requestBody).url(url).addHeader("User-Agent", USER_AGENT);
 
         final String cookies = getCookies(url);
         Log.d("COOKIE", cookies);

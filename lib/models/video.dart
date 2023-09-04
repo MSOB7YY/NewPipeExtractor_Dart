@@ -2,70 +2,72 @@ import 'package:newpipeextractor_dart/exceptions/streamIsNull.dart';
 import 'package:newpipeextractor_dart/extractors/videos.dart';
 import 'package:newpipeextractor_dart/models/infoItems/video.dart';
 import 'package:newpipeextractor_dart/models/streamSegment.dart';
-import 'package:newpipeextractor_dart/models/streams/audioOnlyStream.dart';
-import 'package:newpipeextractor_dart/models/streams/videoOnlyStream.dart';
-import 'package:newpipeextractor_dart/models/streams/videoStream.dart';
+import 'package:newpipeextractor_dart/models/streams.dart';
 import 'package:newpipeextractor_dart/models/videoInfo.dart';
 
 class YoutubeVideo {
-
   /// Video Information
-  VideoInfo videoInfo;
+  final VideoInfo videoInfo;
 
   /// Video Only Streams
-  List<VideoOnlyStream>? videoOnlyStreams;
+  final List<VideoOnlyStream>? videoOnlyStreams;
 
   /// Audio Only Streams
-  List<AudioOnlyStream>? audioOnlyStreams;
+  final List<AudioOnlyStream>? audioOnlyStreams;
 
   /// Video Streams (Muxed, Video + Audio)
-  List<VideoStream>? videoStreams;
+  final List<VideoStream>? videoStreams;
 
   // Video Segments
-  List<StreamSegment>? segments;
+  final List<StreamSegment>? segments;
 
-  YoutubeVideo({
+  const YoutubeVideo({
     required this.videoInfo,
     this.videoOnlyStreams,
     this.audioOnlyStreams,
     this.videoStreams,
-    this.segments
+    this.segments,
   });
 
   /// Transform this object into a StreamInfoItem which is smaller and
   /// allows saving or transporting it via Strings
   StreamInfoItem toStreamInfoItem() {
     return StreamInfoItem(
-      videoInfo.url,
-      videoInfo.id,
-      videoInfo.name,
-      videoInfo.uploaderName,
-      videoInfo.uploaderUrl,
-      videoInfo.uploadDate,
-      videoInfo.uploadDate,
-      videoInfo.length,
-      videoInfo.viewCount
-    );
+        url: videoInfo.url,
+        id: videoInfo.id,
+        name: videoInfo.name,
+        uploaderName: videoInfo.uploaderName,
+        uploaderUrl: videoInfo.uploaderUrl,
+        uploaderAvatarUrl: videoInfo.uploaderAvatarUrl,
+        uploadDate: videoInfo.uploadDate,
+        date: videoInfo.uploadDate,
+        length: videoInfo.duration?.inMilliseconds,
+        viewCount: videoInfo.viewCount,
+        isUploaderVerified: videoInfo.isUploaderVerified,
+        duration: videoInfo.duration,
+        shortDescription: videoInfo.description);
   }
 
   /// If an instance of this object has no streams (Information only)
   /// then, this function will retrieve those streams and return a new
   /// [YoutubeVideo] object
   Future<YoutubeVideo> get getStreams async =>
-    await VideoExtractor.getStream(videoInfo.url);
-  
+      await VideoExtractor.getStream(videoInfo.url);
+
   /// Gets the best quality video only stream
   /// (By resolution, fps is not taken in consideration)
   VideoOnlyStream? get videoOnlyWithHighestQuality {
-    if (videoOnlyStreams == null)
-      throw StreamIsNull("Tried to access a null VideoOnly stream");
+    if (videoOnlyStreams == null) {
+      throw const StreamIsNull("Tried to access a null VideoOnly stream");
+    }
     VideoOnlyStream? video;
     for (var i = 0; i < videoOnlyStreams!.length; i++) {
       if (video == null) {
         video = videoOnlyStreams![i];
       } else {
-        int curRes = int.parse(video.resolution!.split("p").first);
-        int newRes = int.parse(videoOnlyStreams![i].resolution!.split("p").first);
+        final int curRes = int.parse(video.resolution!.split("p").first);
+        final int newRes =
+            int.parse(videoOnlyStreams![i].resolution!.split("p").first);
         if (curRes < newRes) {
           video = videoOnlyStreams![i];
         }
@@ -77,15 +79,16 @@ class YoutubeVideo {
   /// Gets the best quality video stream
   /// (By resolution, fps is not taken in consideration)
   VideoStream? get videoWithHighestQuality {
-    if (videoStreams == null)
-      throw StreamIsNull("Tried to access a null Video stream");
+    if (videoStreams == null) {
+      throw const StreamIsNull("Tried to access a null Video stream");
+    }
     VideoStream? video;
     for (var i = 0; i < videoStreams!.length; i++) {
       if (video == null) {
         video = videoStreams![i];
       } else {
-        int curRes = int.parse(video.resolution!.split("p").first);
-        int newRes = int.parse(videoStreams![i].resolution!.split("p").first);
+        final curRes = int.parse(video.resolution!.split("p").first);
+        final newRes = int.parse(videoStreams![i].resolution!.split("p").first);
         if (curRes < newRes) {
           video = videoStreams![i];
         }
@@ -96,15 +99,16 @@ class YoutubeVideo {
 
   /// Gets the best quality audio stream by Bitrate
   AudioOnlyStream? get audioWithHighestQuality {
-    if (audioOnlyStreams == null)
-      throw StreamIsNull("Tried to access a null Audio stream");
+    if (audioOnlyStreams == null) {
+      throw const StreamIsNull("Tried to access a null Audio stream");
+    }
     AudioOnlyStream? audio;
     for (var i = 0; i < audioOnlyStreams!.length; i++) {
       if (audio == null) {
         audio = audioOnlyStreams![i];
       } else {
-        int curBitrate = audio.averageBitrate;
-        int newBitrate = audioOnlyStreams![i].averageBitrate;
+        final curBitrate = audio.averageBitrate;
+        final newBitrate = audioOnlyStreams![i].averageBitrate;
         if (curBitrate < newBitrate) {
           audio = audioOnlyStreams![i];
         }
@@ -115,23 +119,25 @@ class YoutubeVideo {
 
   /// Gets the best AAC format audio stream
   AudioOnlyStream? get audioWithBestAacQuality {
-    if (audioOnlyStreams == null)
-      throw StreamIsNull("Tried to access a null Audio stream");
-    List<AudioOnlyStream> newList = [];
-    audioOnlyStreams!.forEach((element) {
+    if (audioOnlyStreams == null) {
+      throw const StreamIsNull("Tried to access a null Audio stream");
+    }
+    final List<AudioOnlyStream> newList = [];
+    for (var element in audioOnlyStreams!) {
       if (element.formatName == "m4a") {
         newList.add(element);
       }
-    });
-    if (newList.isEmpty)
+    }
+    if (newList.isEmpty) {
       return audioWithHighestQuality;
+    }
     AudioOnlyStream? audio;
     for (var i = 0; i < newList.length; i++) {
       if (audio == null) {
         audio = newList[i];
       } else {
-        int curBitrate = audio.averageBitrate;
-        int newBitrate = newList[i].averageBitrate;
+        final curBitrate = audio.averageBitrate;
+        final newBitrate = newList[i].averageBitrate;
         if (curBitrate < newBitrate) {
           audio = newList[i];
         }
@@ -142,23 +148,25 @@ class YoutubeVideo {
 
   /// Gets the best OGG format audio stream
   AudioOnlyStream? get audioWithBestOggQuality {
-    if (audioOnlyStreams == null)
-      throw StreamIsNull("Tried to access a null Audio stream");
-    List<AudioOnlyStream> newList = [];
-    audioOnlyStreams!.forEach((element) {
+    if (audioOnlyStreams == null) {
+      throw const StreamIsNull("Tried to access a null Audio stream");
+    }
+    final List<AudioOnlyStream> newList = [];
+    for (var element in audioOnlyStreams!) {
       if (element.formatName == "webm") {
         newList.add(element);
       }
-    });
-    if (newList.isEmpty)
+    }
+    if (newList.isEmpty) {
       return audioWithHighestQuality;
+    }
     AudioOnlyStream? audio;
     for (var i = 0; i < newList.length; i++) {
       if (audio == null) {
         audio = newList[i];
       } else {
-        int curBitrate = audio.averageBitrate;
-        int newBitrate = newList[i].averageBitrate;
+        final curBitrate = audio.averageBitrate;
+        final newBitrate = newList[i].averageBitrate;
         if (curBitrate < newBitrate) {
           audio = newList[i];
         }
@@ -170,7 +178,8 @@ class YoutubeVideo {
   /// Get the best audio stream for the specified video stream
   /// taking in consideration the video stream format
   /// (MP4 supports AAC codec while WEBM supports OGG codec)
-  AudioOnlyStream? getAudioStreamWithBestMatchForVideoStream(VideoOnlyStream stream) {
+  AudioOnlyStream? getAudioStreamWithBestMatchForVideoStream(
+      VideoOnlyStream stream) {
     if (stream.formatSuffix == "mp4") {
       return audioWithBestAacQuality;
     } else if (stream.formatSuffix == "webm") {
@@ -179,6 +188,4 @@ class YoutubeVideo {
       return null;
     }
   }
-
 }
-

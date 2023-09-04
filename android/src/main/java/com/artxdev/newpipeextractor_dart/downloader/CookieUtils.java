@@ -8,8 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public final class CookieUtils {
-    private CookieUtils() {
-    }
+    private CookieUtils() {}
 
     public static String concatCookies(final Collection<String> cookieStrings) {
         final Set<String> cookieSet = new HashSet<>();

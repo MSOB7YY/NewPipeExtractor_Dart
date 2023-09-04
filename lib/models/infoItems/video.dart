@@ -1,13 +1,10 @@
 import 'dart:convert';
 
-import 'package:newpipeextractor_dart/extractors/channels.dart';
-import 'package:newpipeextractor_dart/extractors/videos.dart';
-import 'package:newpipeextractor_dart/models/channel.dart';
-import 'package:newpipeextractor_dart/models/video.dart';
+import 'package:newpipeextractor_dart/models/infoItems/yt_feed.dart';
+import 'package:newpipeextractor_dart/utils/stringChecker.dart';
 import 'package:newpipeextractor_dart/utils/thumbnails.dart';
 
-class StreamInfoItem {
-
+class StreamInfoItem extends YoutubeFeed {
   /// Video URL
   final String? url;
 
@@ -23,109 +20,115 @@ class StreamInfoItem {
   /// Video uploader channel url
   final String? uploaderUrl;
 
+  /// Video uploader avatar url
+  final String? uploaderAvatarUrl;
+
   /// Video date
   final String? uploadDate;
 
   /// Video full date
   final String? date;
 
-  /// Video duration in seconds (s)
-  final int? duration;
+  /// Video duration
+  final Duration? duration;
 
   /// Video view count
   final int? viewCount;
 
-  StreamInfoItem(
-    this.url,
-    this.id,
-    this.name,
-    this.uploaderName,
-    this.uploaderUrl,
-    this.uploadDate,
-    this.date,
-    this.duration,
-    this.viewCount
-  ) {
-    thumbnails = StreamThumbnail(id);
-  }
+  final int? length;
+
+  /// uploader is verified
+  final bool? isUploaderVerified;
+
+  final String? shortDescription;
+
+  const StreamInfoItem({
+    required this.url,
+    required this.id,
+    required this.name,
+    required this.uploaderName,
+    required this.uploaderUrl,
+    required this.uploaderAvatarUrl,
+    required this.uploadDate,
+    required this.date,
+    required this.duration,
+    required this.viewCount,
+    required this.length,
+    required this.isUploaderVerified,
+    required this.shortDescription,
+  });
 
   /// Stream Thumbnails
-  StreamThumbnail? thumbnails;
+  StreamThumbnail? get thumbnails => id == null ? null : StreamThumbnail(id);
 
   /// Gets full YoutubeVideo containing more Information and
   /// all necessary streams for Streaming and Downloading
-  Future<YoutubeVideo> get getVideo async {
-    return await VideoExtractor.getStream(url);
-  }
+  // Future<YoutubeVideo> get getVideo async {
+  //   return await VideoExtractor.getStream(url);
+  // }
 
-  /// Obtains the full information of the authors Channel
-  /// into a YoutubeChannel object
-  Future<YoutubeChannel> get getChannel async {
-    return await ChannelExtractor.channelInfo(uploaderUrl);
-  }
+  // /// Obtains the full information of the authors Channel
+  // /// into a YoutubeChannel object
+  // Future<YoutubeChannel> get getChannel async {
+  //   return await ChannelExtractor.channelInfo(uploaderUrl);
+  // }
 
   /// Transform object toMap
-  Map<dynamic, dynamic> toMap() {
+  Map<String, String?> toMap() {
     return {
       'url': url,
       'id': id,
       'name': name,
       'uploaderName': uploaderName,
       'uploaderUrl': uploaderUrl,
+      'uploaderAvatarUrl': uploaderAvatarUrl,
       'uploadDate': uploadDate,
       'date': date,
-      'duration': duration.toString(),
-      'viewCount': viewCount.toString()
+      'duration': duration?.inSeconds.toString(),
+      'viewCount': viewCount.toString(),
+      'length': length.toString(),
+      'isUploaderVerified': isUploaderVerified.toString(),
+      'shortDescription': shortDescription,
     };
   }
 
   /// Get StreamInfoItem object fromMap
-  static StreamInfoItem fromMap(Map<dynamic, dynamic> map) {
+  factory StreamInfoItem.fromMap(Map<dynamic, dynamic> map) {
     return StreamInfoItem(
-      map['url'],
-      map['id'],
-      map['name'],
-      map['uploaderName'],
-      map['uploaderUrl'],
-      map['uploadDate'],
-      map['date'],
-      int.parse(map['duration']),
-      int.parse(map['viewCount'])
+      url: map['url'],
+      id: map['id'],
+      name: map['name'],
+      uploaderName: map['uploaderName'],
+      uploaderUrl: map['uploaderUrl'],
+      uploaderAvatarUrl: map['uploaderAvatarUrl'],
+      uploadDate: map['uploadDate'],
+      date: map['date'],
+      length: map['length'],
+      duration: Duration(seconds: int.tryParse(map['duration'] ?? '') ?? 0),
+      viewCount: int.tryParse(map['viewCount'] ?? ''),
+      isUploaderVerified: (map['isUploaderVerified'] as String?)?.checkTrue(),
+      shortDescription: map['shortDescription'],
     );
   }
 
   /// Get a list of StreamInfoItem from a simple (valid) json String
   static List<StreamInfoItem> fromJsonString(String jsonString) {
-    Map<String, dynamic> decodedMap = jsonDecode(jsonString);
-    List<dynamic>? list = decodedMap['listStream'];
-    List<StreamInfoItem> streams = [];
+    final Map<String, dynamic> decodedMap = jsonDecode(jsonString);
+    final List<dynamic>? list = decodedMap['listStream'];
     if (list == null) return [];
-    list.forEach((element) {
-      StreamInfoItem s = StreamInfoItem.fromMap(element);
-      streams.add(s);
-    });
+
+    final List<StreamInfoItem> streams = [];
+    for (final element in list) {
+      final str = StreamInfoItem.fromMap(element);
+      streams.add(str);
+    }
     return streams;
   }
 
   /// Transform a list of StreamInfoItem into a simple json String
   static String listToJson(List<StreamInfoItem> list) {
-    List<Map<String, String?>> x = list
-      .map((e) => 
-        {
-          'url': e.url,
-          'id': e.id,
-          'name': e.name,
-          'uploaderName': e.uploaderName,
-          'uploaderUrl': e.uploaderUrl,
-          'uploadDate': e.uploadDate,
-          'date': e.date,
-          'duration': e.duration.toString(),
-          'viewCount': e.viewCount.toString()
-        }
-      )
-      .toList();
+    final List<Map<String, String?>> x = list.map((e) => e.toMap()).toList();
     Map<String, dynamic> map() => {'listStream': x};
     return jsonEncode(map());
   }
-
 }

@@ -51,32 +51,31 @@ import io.flutter.plugin.common.MethodChannel.Result;
 @SuppressWarnings("unchecked")
 @SuppressLint("ApplySharedPref")
 public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHandler {
-  /// The MethodChannel that will the communication between Flutter and native Android
+  /// The MethodChannel that will the communication between Flutter and native
+  /// Android
   ///
-  /// This local reference serves to register the plugin with the Flutter Engine and unregister it
+  /// This local reference serves to register the plugin with the Flutter Engine
+  /// and unregister it
   /// when the Flutter Engine is detached from the Activity
   private MethodChannel channel;
 
   private Context context;
 
-  private final YoutubeSearchExtractor searchExtractor
-          = new YoutubeSearchExtractor();
-  private final YoutubeMusicExtractor musicExtractor
-          = new YoutubeMusicExtractor();
+  private final YoutubeSearchExtractor searchExtractor = new YoutubeSearchExtractor();
+  private final YoutubeMusicExtractor musicExtractor = new YoutubeMusicExtractor();
 
-  private final YoutubeChannelExtractorImpl channelExtractor
-          = new YoutubeChannelExtractorImpl();
+  private final YoutubeChannelExtractorImpl channelExtractor = new YoutubeChannelExtractorImpl();
+
+  private final YoutubeCommentsExtractorImpl commentsExtractor = new YoutubeCommentsExtractorImpl();
 
   private final String PREFS_COOKIES_KEY = "prefs_cookies_key";
 
   @Override
-  public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
+  public void onAttachedToEngine(@NonNull final FlutterPluginBinding flutterPluginBinding) {
     context = flutterPluginBinding.getApplicationContext();
-    NewPipe.init(DownloaderImpl.getInstance(),
-            Localization.fromLocale(Locale.getDefault()),
-            new ContentCountry(Locale.getDefault().getCountry()));
-    final SharedPreferences preferences = PreferenceManager
-            .getDefaultSharedPreferences(context);
+    NewPipe.init(DownloaderImpl.getInstance(), Localization.fromLocale(Locale.getDefault()),
+        new ContentCountry(Locale.getDefault().getCountry()));
+    final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
     final String cookie = preferences.getString(PREFS_COOKIES_KEY, null);
     if (cookie != "") {
       DownloaderImpl.getInstance().setCookie(cookie);
@@ -88,10 +87,10 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
   @Override
   public void onMethodCall(@NonNull final MethodCall call, @NonNull final Result result) {
     final String method = call.method;
-    final Map[] info = new Map[]{new HashMap<>()};
+    final Map[] info = new Map[] { new HashMap<>() };
     final ExecutorService executor = Executors.newSingleThreadExecutor();
     final Handler handler = new Handler(Looper.getMainLooper());
-    final List<Map>[] listMaps = new List[]{new ArrayList<>()};
+    final List<Map>[] listMaps = new List[] { new ArrayList<>() };
     executor.execute(new Runnable() {
       @Override
       public void run() {
@@ -100,10 +99,10 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
         //
         // Get Channel Information by Url
         if (method.equals("getChannel")) {
-          String channelUrl = call.argument("channelUrl");
+          final String channelUrl = call.argument("channelUrl");
           try {
             info[0] = channelExtractor.getChannel(channelUrl);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             e.printStackTrace();
             info[0].put("error", e.getMessage());
           }
@@ -111,31 +110,41 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
 
         // Get ID from a Stream URL
         if (method.equals("getIdFromStreamUrl")) {
-          String streamUrl = call.argument("streamUrl");
-          String id = YoutubeLinkHandler.getIdFromStreamUrl(streamUrl);
+          final String streamUrl = call.argument("streamUrl");
+          final String id = YoutubeLinkHandler.getIdFromStreamUrl(streamUrl);
           info[0].put("id", id);
         }
 
         // Get ID from a Playlist URL
         if (method.equals("getIdFromPlaylistUrl")) {
-          String playlistUrl = call.argument("playlistUrl");
-          String id = YoutubeLinkHandler.getIdFromPlaylistUrl(playlistUrl);
+          final String playlistUrl = call.argument("playlistUrl");
+          final String id = YoutubeLinkHandler.getIdFromPlaylistUrl(playlistUrl);
           info[0].put("id", id);
         }
 
         // Get ID from a Channel URL
         if (method.equals("getIdFromChannelUrl")) {
-          String channelUrl = call.argument("channelUrl");
-          String id = YoutubeLinkHandler.getIdFromChannelUrl(channelUrl);
+          final String channelUrl = call.argument("channelUrl");
+          final String id = YoutubeLinkHandler.getIdFromChannelUrl(channelUrl);
           info[0].put("id", id);
         }
 
         // Gets video comments
         if (method.equals("getComments")) {
-          String videoUrl = call.argument("videoUrl");
+          final String videoUrl = call.argument("videoUrl");
           try {
-            info[0] = YoutubeCommentsExtractorImpl.getComments(videoUrl);
-          } catch (Exception e) {
+            info[0] = commentsExtractor.getComments(videoUrl);
+          } catch (final Exception e) {
+            e.printStackTrace();
+            info[0].put("error", e.getMessage());
+          }
+        }
+
+        // loads next comments
+        if (method.equals("getCommentsNextPage")) {
+          try {
+            info[0] = commentsExtractor.getCommentsNextPage();
+          } catch (final Exception e) {
             e.printStackTrace();
             info[0].put("error", e.getMessage());
           }
@@ -143,10 +152,10 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
 
         // Gets all Video Information including Audio, Video and Muxed Streams
         if (method.equals("getVideoInfoAndStreams")) {
-          String videoUrl = call.argument("videoUrl");
+          final String videoUrl = call.argument("videoUrl");
           try {
             listMaps[0] = StreamExtractorImpl.getStream(videoUrl);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             e.printStackTrace();
             info[0].put("error", e.getMessage());
           }
@@ -154,10 +163,10 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
 
         // Get all Video information without Streams
         if (method.equals("getVideoInformation")) {
-          String videoUrl = call.argument("videoUrl");
+          final String videoUrl = call.argument("videoUrl");
           try {
             info[0] = StreamExtractorImpl.getInfo(videoUrl);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             e.printStackTrace();
             info[0].put("error", e.getMessage());
           }
@@ -165,10 +174,10 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
 
         // Get all Video Streams
         if (method.equals("getAllVideoStreams")) {
-          String videoUrl = call.argument("videoUrl");
+          final String videoUrl = call.argument("videoUrl");
           try {
             listMaps[0] = StreamExtractorImpl.getMediaStreams(videoUrl);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             e.printStackTrace();
             info[0].put("error", e.getMessage());
           }
@@ -176,10 +185,10 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
 
         // Get Video Only Streams
         if (method.equals("getVideoOnlyStreams")) {
-          String videoUrl = call.argument("videoUrl");
+          final String videoUrl = call.argument("videoUrl");
           try {
             info[0] = StreamExtractorImpl.getVideoOnlyStreams(videoUrl);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             e.printStackTrace();
             info[0].put("error", e.getMessage());
           }
@@ -187,10 +196,10 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
 
         // Get Audio Only Streams
         if (method.equals("getAudioOnlyStreams")) {
-          String videoUrl = call.argument("videoUrl");
+          final String videoUrl = call.argument("videoUrl");
           try {
             info[0] = StreamExtractorImpl.getAudioOnlyStreams(videoUrl);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             e.printStackTrace();
             info[0].put("error", e.getMessage());
           }
@@ -198,10 +207,10 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
 
         // Get Video Streams (Muxed)
         if (method.equals("getVideoStreams")) {
-          String videoUrl = call.argument("videoUrl");
+          final String videoUrl = call.argument("videoUrl");
           try {
             info[0] = StreamExtractorImpl.getMuxedStreams(videoUrl);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             e.printStackTrace();
             info[0].put("error", e.getMessage());
           }
@@ -209,10 +218,10 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
 
         // Get Video Segments
         if (method.equals("getVideoSegments")) {
-          String videoUrl = call.argument("videoUrl");
+          final String videoUrl = call.argument("videoUrl");
           try {
             info[0] = StreamExtractorImpl.getStreamSegments(videoUrl);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             e.printStackTrace();
             info[0].put("error", e.getMessage());
           }
@@ -220,11 +229,11 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
 
         // Search Youtube for Videos/Channels/Playlists
         if (method.equals("searchYoutube")) {
-          String query = call.argument("query");
-          List<String> filters = call.argument("filters");
+          final String query = call.argument("query");
+          final List<String> filters = call.argument("filters");
           try {
             info[0] = searchExtractor.searchYoutube(query, filters);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             e.printStackTrace();
             info[0].put("error", e.getMessage());
           }
@@ -234,7 +243,7 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
         if (method.equals("getNextPage")) {
           try {
             info[0] = searchExtractor.getNextPage();
-          } catch (Exception e) {
+          } catch (final Exception e) {
             e.printStackTrace();
             info[0].put("error", e.getMessage());
           }
@@ -242,11 +251,11 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
 
         // Search Youtube for Music
         if (method.equals("searchYoutubeMusic")) {
-          String query = call.argument("query");
-          List<String> filters = call.argument("filters");
+          final String query = call.argument("query");
+          final List<String> filters = call.argument("filters");
           try {
             info[0] = musicExtractor.searchYoutube(query, filters);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             e.printStackTrace();
             info[0].put("error", e.getMessage());
           }
@@ -256,7 +265,7 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
         if (method.equals("getNextMusicPage")) {
           try {
             info[0] = musicExtractor.getNextPage();
-          } catch (Exception e) {
+          } catch (final Exception e) {
             e.printStackTrace();
             info[0].put("error", e.getMessage());
           }
@@ -264,10 +273,10 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
 
         // Get the Playlist Details
         if (method.equals("getPlaylistDetails")) {
-          String playlistUrl = call.argument("playlistUrl");
+          final String playlistUrl = call.argument("playlistUrl");
           try {
             info[0] = YoutubePlaylistExtractorImpl.getPlaylistDetails(playlistUrl);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             e.printStackTrace();
             info[0].put("error", e.getMessage());
           }
@@ -275,10 +284,10 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
 
         // Get streams from a Playlist
         if (method.equals("getPlaylistStreams")) {
-          String playlistUrl = call.argument("playlistUrl");
+          final String playlistUrl = call.argument("playlistUrl");
           try {
             info[0] = YoutubePlaylistExtractorImpl.getPlaylistStreams(playlistUrl);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             e.printStackTrace();
             info[0].put("error", e.getMessage());
           }
@@ -286,10 +295,10 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
 
         // Get all Streams from a Channel URL
         if (method.equals("getChannelUploads")) {
-          String channelUrl = call.argument("channelUrl");
+          final String channelUrl = call.argument("channelUrl");
           try {
             info[0] = channelExtractor.getChannelUploads(channelUrl);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             e.printStackTrace();
             info[0].put("error", e.getMessage());
           }
@@ -299,7 +308,7 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
         if (method.equals("getChannelNextPage")) {
           try {
             info[0] = channelExtractor.getChannelNextPage();
-          } catch (Exception e) {
+          } catch (final Exception e) {
             e.printStackTrace();
             info[0].put("error", e.getMessage());
           }
@@ -307,10 +316,10 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
 
         // Get related streams from video url
         if (method.equals("getRelatedStreams")) {
-          String videoUrl = call.argument("videoUrl");
+          final String videoUrl = call.argument("videoUrl");
           try {
             info[0] = StreamExtractorImpl.getRelatedStreams(videoUrl);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             e.printStackTrace();
             info[0].put("error", e.getMessage());
           }
@@ -320,7 +329,7 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
         if (method.equals("getTrendingStreams")) {
           try {
             info[0] = YoutubeTrendingExtractorImpl.getTrendingPage();
-          } catch (Exception e) {
+          } catch (final Exception e) {
             e.printStackTrace();
             info[0].put("error", e.getMessage());
           }
@@ -328,11 +337,10 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
 
         // Set cookie on our DownloaderImpl
         if (method.equals("setCookie")) {
-          String cookie = call.argument("cookie");
+          final String cookie = call.argument("cookie");
           if (cookie != null) {
             DownloaderImpl.getInstance().setCookie(cookie);
-            final SharedPreferences preferences = PreferenceManager
-                    .getDefaultSharedPreferences(context);
+            final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
             preferences.edit().putString(PREFS_COOKIES_KEY, cookie).commit();
             info[0].put("status", "success");
           } else {
@@ -342,11 +350,11 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
 
         // Get cookie string from url
         if (method.equals("getCookieByUrl")) {
-          String url = call.argument("url");
+          final String url = call.argument("url");
           try {
             final String cookie = CookieManager.getInstance().getCookie(url);
             info[0].put("cookie", cookie);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             e.printStackTrace();
             info[0].put("error", e.getMessage());
           }
@@ -354,10 +362,10 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
 
         // Decode Cookie
         if (method.equals("decodeCookie")) {
-          String cookie = call.argument("cookie");
+          final String cookie = call.argument("cookie");
           try {
             info[0].put("cookie", URLDecoder.decode(cookie, "UTF-8"));
-          } catch (Exception e) {
+          } catch (final Exception e) {
             e.printStackTrace();
             info[0].put("error", e.getMessage());
           }
@@ -380,15 +388,14 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
   }
 
   @Override
-  public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+  public void onDetachedFromEngine(@NonNull final FlutterPluginBinding binding) {
     channel.setMethodCallHandler(null);
   }
 
-  public Boolean useList(String methodName) {
-    List<String> functions = new ArrayList<>();
+  public Boolean useList(final String methodName) {
+    final List<String> functions = new ArrayList<>();
     functions.add("getVideoInfoAndStreams");
     functions.add("getAllVideoStreams");
     return functions.contains(methodName);
   }
 }
-

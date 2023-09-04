@@ -9,15 +9,17 @@ import 'package:newpipeextractor_dart/utils/navigationService.dart';
 bool resolvingCaptcha = false;
 
 class ReCaptchaPage extends StatefulWidget {
-  static Future<dynamic> checkInfo(info, Future<dynamic> task()) async {
+  const ReCaptchaPage({super.key});
+
+  static Future<dynamic> checkInfo(
+      info, Future<dynamic> Function() task) async {
     if ((info as Map).containsKey("error")) {
       if (info["error"].contains("reCaptcha")) {
         if (!resolvingCaptcha) {
           resolvingCaptcha = true;
-          String url = info["error"].split(":").last.trim();
-          await NavigationService.instance
-              .navigateTo("reCaptcha", "http:" + url);
-          var newInfo = await task();
+          final String url = info["error"].split(":").last.trim();
+          await NavigationService.instance.navigateTo("reCaptcha", "http:$url");
+          final newInfo = await task();
           resolvingCaptcha = false;
           return newInfo;
         }
@@ -37,25 +39,27 @@ class _ReCaptchaPageState extends State<ReCaptchaPage> {
 
   @override
   Widget build(BuildContext context) {
-    String url = ModalRoute.of(context)!.settings.arguments as String;
+    final String url = ModalRoute.of(context)!.settings.arguments as String;
     return Material(
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
           title: ListTile(
-            title: Text("reCaptcha", style: TextStyle(color: Colors.white)),
+            title:
+                const Text("reCaptcha", style: TextStyle(color: Colors.white)),
             subtitle: Text("Solve the reCaptcha and confirm",
                 style: TextStyle(color: Colors.white.withOpacity(0.6))),
           ),
           backgroundColor: Colors.redAccent,
           actions: [
             IconButton(
-              icon: Icon(Icons.check_rounded),
+              icon: const Icon(Icons.check_rounded),
               color: Colors.white,
               onPressed: () async {
-                String currentUrl = await (controller?.getUrl() as FutureOr<String?>) ?? url;
-                var info = await NewPipeExtractorDart.extractorChannel
-                    .invokeMethod('getCookieByUrl', {"url": currentUrl});
+                final String currentUrl =
+                    await (controller?.getUrl() as FutureOr<String?>) ?? url;
+                final info = await NewPipeExtractorDart.execute(
+                    'getCookieByUrl', {"url": currentUrl});
                 String? cookies = info['cookie'];
                 handleCookies(cookies);
                 // Sometimes cookies are inside the url
@@ -65,13 +69,14 @@ class _ReCaptchaPageState extends State<ReCaptchaPage> {
                   try {
                     String? abuseCookie =
                         currentUrl.substring(abuseStart + 12, abuseEnd);
-                    abuseCookie = await (NewPipeExtractorDart.extractorChannel
-                        .invokeMethod('decodeCookie', {"cookie": abuseCookie}) as FutureOr<String>);
+                    abuseCookie = await (NewPipeExtractorDart.execute(
+                            'decodeCookie', {"cookie": abuseCookie})
+                        as FutureOr<String>);
                     handleCookies(abuseCookie);
                   } catch (_) {}
                 }
-                await NewPipeExtractorDart.extractorChannel
-                    .invokeMethod('setCookie', {"cookie": foundCookies});
+                await NewPipeExtractorDart.execute(
+                    'setCookie', {"cookie": foundCookies});
                 Navigator.pop(context);
               },
             ),
@@ -102,9 +107,9 @@ class _ReCaptchaPageState extends State<ReCaptchaPage> {
       if (foundCookies.isEmpty || foundCookies.endsWith("; ")) {
         foundCookies += cookies;
       } else if (foundCookies.endsWith(";")) {
-        foundCookies += " " + cookies;
+        foundCookies += " $cookies";
       } else {
-        foundCookies += "; " + cookies;
+        foundCookies += "; $cookies";
       }
     }
   }

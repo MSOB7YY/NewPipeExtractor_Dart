@@ -1,13 +1,12 @@
 package com.artxdev.newpipeextractor_dart.youtube;
 
-import com.artxdev.newpipeextractor_dart.downloader.DownloaderImpl;
-
 import org.schabi.newpipe.extractor.ListExtractor;
 import org.schabi.newpipe.extractor.ListExtractor.InfoItemsPage;
-import org.schabi.newpipe.extractor.NewPipe;
 import org.schabi.newpipe.extractor.comments.CommentsInfoItem;
+import org.schabi.newpipe.extractor.localization.DateWrapper;
 import org.schabi.newpipe.extractor.services.youtube.extractors.YoutubeCommentsExtractor;
 
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,30 +14,69 @@ import java.util.Map;
 import static org.schabi.newpipe.extractor.ServiceList.YouTube;
 
 public class YoutubeCommentsExtractorImpl {
+    private ListExtractor.InfoItemsPage<CommentsInfoItem> currentPage;
+    private YoutubeCommentsExtractor extractor;
+    private Integer totalCommentsCount = -1;
 
-    public static Map<Integer, Map<String, String>> getComments(String url) throws Exception {
-        YoutubeCommentsExtractor extractor;
-        extractor = (YoutubeCommentsExtractor) YouTube
-                .getCommentsExtractor(url);
+    public Map<Integer, Map<String, String>> getComments(final String url) throws Exception {
+        totalCommentsCount = -1; // resetting total comments count.
+
+        extractor = (YoutubeCommentsExtractor) YouTube.getCommentsExtractor(url);
         extractor.fetchPage();
-        Map<Integer, Map<String, String>> commentsMap = new HashMap<>();
-        InfoItemsPage<CommentsInfoItem> commentsInfo = extractor.getInitialPage();
-        List<CommentsInfoItem> comments = commentsInfo.getItems();
-        for (int i = 0; i < comments.size(); i++) {
-            CommentsInfoItem comment = comments.get(i);
-            Map<String, String> commentMap = new HashMap<>();
-            commentMap.put("commentId", comment.getCommentId());
-            commentMap.put("author", comment.getUploaderName());
-            commentMap.put("commentText", comment.getCommentText().getContent());
-            commentMap.put("uploaderAvatarUrl", comment.getUploaderAvatarUrl());
-            commentMap.put("uploadDate", comment.getTextualUploadDate());
-            commentMap.put("uploaderUrl", comment.getUploaderUrl());
-            commentMap.put("likeCount", String.valueOf(comment.getLikeCount()));
-            commentMap.put("pinned", String.valueOf(comment.isPinned()));
-            commentMap.put("hearted", String.valueOf(comment.isHeartedByUploader()));
-            commentsMap.put(i, commentMap);
+        currentPage = extractor.getInitialPage();
+        final InfoItemsPage<CommentsInfoItem> commentsInfo = extractor.getInitialPage();
+        final List<CommentsInfoItem> comments = commentsInfo.getItems();
+
+        return parseData(comments);
+    }
+
+    public Map<Integer, Map<String, String>> getCommentsNextPage() throws Exception {
+        if (currentPage.hasNextPage()) {
+            currentPage = extractor.getPage(currentPage.getNextPage());
+            final List<CommentsInfoItem> items = currentPage.getItems();
+            return parseData(items);
+        } else {
+            return new HashMap<>();
         }
-        return commentsMap;
+    }
+
+    private Map<Integer, Map<String, String>> parseData(final List<CommentsInfoItem> items) throws Exception {
+        if (totalCommentsCount == -1) {
+            try {
+                totalCommentsCount = extractor.getCommentsCount();
+            } catch (Exception ignore) {
+                totalCommentsCount = -1;
+            }
+        }
+        final Map<Integer, Map<String, String>> itemsMap = new HashMap<>();
+        for (int i = 0; i < items.size(); i++) {
+            final CommentsInfoItem item = items.get(i);
+            final Map<String, String> itemMap = new HashMap<>();
+
+            itemMap.put("commentId", item.getCommentId());
+            itemMap.put("author", item.getUploaderName());
+            itemMap.put("commentText", item.getCommentText().getContent());
+            itemMap.put("uploaderAvatarUrl", item.getUploaderAvatarUrl());
+            itemMap.put("uploadDate", item.getTextualUploadDate());
+            itemMap.put("uploaderUrl", item.getUploaderUrl());
+            itemMap.put("likeCount", String.valueOf(item.getLikeCount()));
+            itemMap.put("pinned", String.valueOf(item.isPinned()));
+            itemMap.put("hearted", String.valueOf(item.isHeartedByUploader()));
+            itemMap.put("replyCount", String.valueOf(item.getReplyCount()));
+            itemMap.put("totalCommentsCount", String.valueOf(totalCommentsCount));
+
+            itemMap.put("name", item.getName());
+
+            final DateWrapper date = item.getUploadDate();
+            if (date != null) {
+                itemMap.put("date", date.offsetDateTime().format(DateTimeFormatter.ISO_DATE_TIME));
+            }
+
+            itemMap.put("thumbnailUrl", item.getThumbnailUrl());
+            itemMap.put("url", item.getUrl());
+            itemsMap.put(i, itemMap);
+        }
+        return itemsMap;
     }
 
 }

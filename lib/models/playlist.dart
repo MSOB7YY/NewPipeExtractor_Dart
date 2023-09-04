@@ -3,71 +3,80 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:newpipeextractor_dart/extractors/playlist.dart';
-import 'package:newpipeextractor_dart/models/infoItems/playlist.dart';
+import 'package:newpipeextractor_dart/models/enums.dart';
 import 'package:newpipeextractor_dart/models/infoItems/video.dart';
+import 'package:newpipeextractor_dart/models/infoItems/yt_feed.dart';
+import 'package:newpipeextractor_dart/utils/stringChecker.dart';
 
-class YoutubePlaylist {
-
+class YoutubePlaylist extends YoutubeFeed {
   /// Playlist ID
-  String? id;
+  final String? id;
 
   /// Playlist name
-  String? name;
+  final String? name;
 
   /// Playlist full URL
-  String? url;
+  final String? url;
 
   /// Playlist authors name
-  String? uploaderName;
+  final String? uploaderName;
 
   /// Playlist author avatar url
-  String? uploaderAvatarUrl;
+  final String? uploaderAvatarUrl;
 
   /// Playlist channel url
-  String? uploaderUrl;
+  final String? uploaderUrl;
 
   /// Playlist banner url
-  String? bannerUrl;
+  final String? bannerUrl;
 
   /// Playlist thumbnail url
-  String? thumbnailUrl;
+  final String? thumbnailUrl;
 
   /// Playlist videos ammount
-  int streamCount;
+  final int streamCount;
 
   /// Playlist streams (Videos)
-  List<StreamInfoItem>? streams;
+  final List<StreamInfoItem> streams;
 
-  YoutubePlaylist(
-    this.id,
-    this.name,
-    this.url,
-    this.uploaderName,
-    this.uploaderAvatarUrl,
-    this.uploaderUrl,
-    this.bannerUrl,
-    this.thumbnailUrl,
-    this.streamCount,
-    {this.streams}
-  );
+  final PlaylistType? playlistType;
+
+  final bool? isUploaderVerified;
+
+  final String? description;
+
+  const YoutubePlaylist({
+    required this.id,
+    required this.name,
+    required this.url,
+    required this.uploaderName,
+    required this.uploaderAvatarUrl,
+    required this.uploaderUrl,
+    required this.bannerUrl,
+    required this.thumbnailUrl,
+    required this.streamCount,
+    this.streams = const <StreamInfoItem>[],
+    required this.playlistType,
+    required this.isUploaderVerified,
+    required this.description,
+  });
 
   /// Transform this object into a PlaylistInfoItem which is smaller and
   /// allows saving or transporting it via Strings
-  PlaylistInfoItem toPlaylistInfoItem() {
-    return PlaylistInfoItem(
-      url,
-      name,
-      uploaderName,
-      thumbnailUrl,
-      streamCount
-    );
-  }
+  // PlaylistInfoItem toPlaylistInfoItem() {
+  //   return PlaylistInfoItem(
+  //     url,
+  //     name,
+  //     uploaderName,
+  //     thumbnailUrl,
+  //     streamCount,
+  //   );
+  // }
 
   /// Retrieve this Playlist list of streams (List of StreamInfoItem)
   Future<void> getStreams() async {
-    streams = await PlaylistExtractor.getPlaylistStreams(url);
+    streams.addAll(await PlaylistExtractor.getPlaylistStreams(url));
   }
-
 
   YoutubePlaylist copyWith({
     String? id,
@@ -80,18 +89,24 @@ class YoutubePlaylist {
     String? thumbnailUrl,
     int? streamCount,
     List<StreamInfoItem>? streams,
+    PlaylistType? playlistType,
+    bool? isUploaderVerified,
+    String? description,
   }) {
     return YoutubePlaylist(
-      id ?? this.id,
-      name ?? this.name,
-      url ?? this.url,
-      uploaderName ?? this.uploaderName,
-      uploaderAvatarUrl ?? this.uploaderAvatarUrl,
-      uploaderUrl ?? this.uploaderUrl,
-      bannerUrl ?? this.bannerUrl,
-      thumbnailUrl ?? this.thumbnailUrl,
-      streamCount ?? this.streamCount,
+      id: id ?? this.id,
+      name: name ?? this.name,
+      url: url ?? this.url,
+      uploaderName: uploaderName ?? this.uploaderName,
+      uploaderAvatarUrl: uploaderAvatarUrl ?? this.uploaderAvatarUrl,
+      uploaderUrl: uploaderUrl ?? this.uploaderUrl,
+      bannerUrl: bannerUrl ?? this.bannerUrl,
+      thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
+      streamCount: streamCount ?? this.streamCount,
       streams: streams ?? this.streams,
+      playlistType: playlistType ?? this.playlistType,
+      isUploaderVerified: isUploaderVerified ?? this.isUploaderVerified,
+      description: description ?? this.description,
     );
   }
 
@@ -106,62 +121,72 @@ class YoutubePlaylist {
       'bannerUrl': bannerUrl,
       'thumbnailUrl': thumbnailUrl,
       'streamCount': streamCount,
-      'streams': streams == null ? [] : streams!.map((x) => x?.toMap()).toList(),
+      'streams': streams.map((x) => x.toMap()).toList(),
+      'playlistType': playlistType?.name,
+      'isUploaderVerified': isUploaderVerified.toString(),
+      'description': description,
     };
   }
 
   factory YoutubePlaylist.fromMap(Map<String, dynamic> map) {
     return YoutubePlaylist(
-      map['id'] != null ? map['id'] as String : null,
-      map['name'] != null ? map['name'] as String : null,
-      map['url'] != null ? map['url'] as String : null,
-      map['uploaderName'] != null ? map['uploaderName'] as String : null,
-      map['uploaderAvatarUrl'] != null ? map['uploaderAvatarUrl'] as String : null,
-      map['uploaderUrl'] != null ? map['uploaderUrl'] as String : null,
-      map['bannerUrl'] != null ? map['bannerUrl'] as String : null,
-      map['thumbnailUrl'] != null ? map['thumbnailUrl'] as String : null,
-      map['streamCount'] as int,
-      streams: map['streams'] != null ? List<StreamInfoItem>.from((map['streams']).map<StreamInfoItem?>((x) => StreamInfoItem.fromMap(x as Map<String,dynamic>),),) : [],
+      id: map['id'] as String?,
+      name: map['name'] as String?,
+      url: map['url'] as String?,
+      uploaderName: map['uploaderName'] as String?,
+      uploaderAvatarUrl: map['uploaderAvatarUrl'] as String?,
+      uploaderUrl: map['uploaderUrl'] as String?,
+      bannerUrl: map['bannerUrl'] as String?,
+      thumbnailUrl: map['thumbnailUrl'] as String?,
+      streamCount: int.tryParse(map['streamCount'] ?? '') ?? 0,
+      streams: List<StreamInfoItem>.from(
+        (map['streams'] as List?)?.map(
+                (x) => StreamInfoItem.fromMap(x as Map<String, dynamic>)) ??
+            [],
+      ),
+      playlistType: PlaylistType.values.getEnum(map['playlistType']),
+      isUploaderVerified: (map['isUploaderVerified'] as String?)?.checkTrue(),
+      description: map['description'],
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory YoutubePlaylist.fromJson(String source) => YoutubePlaylist.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory YoutubePlaylist.fromJson(String source) =>
+      YoutubePlaylist.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
-    return 'YoutubePlaylist(id: $id, name: $name, url: $url, uploaderName: $uploaderName, uploaderAvatarUrl: $uploaderAvatarUrl, uploaderUrl: $uploaderUrl, bannerUrl: $bannerUrl, thumbnailUrl: $thumbnailUrl, streamCount: $streamCount, streams: $streams)';
+    return 'YoutubePlaylist(id: $id, name: $name, url: $url, uploaderName: $uploaderName, uploaderAvatarUrl: $uploaderAvatarUrl, uploaderUrl: $uploaderUrl, bannerUrl: $bannerUrl, thumbnailUrl: $thumbnailUrl, streamCount: $streamCount, streams: $streams, playlistType: $playlistType, description: $description, isUploaderVerified: $isUploaderVerified)';
   }
 
   @override
   bool operator ==(covariant YoutubePlaylist other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.id == id &&
-      other.name == name &&
-      other.url == url &&
-      other.uploaderName == uploaderName &&
-      other.uploaderAvatarUrl == uploaderAvatarUrl &&
-      other.uploaderUrl == uploaderUrl &&
-      other.bannerUrl == bannerUrl &&
-      other.thumbnailUrl == thumbnailUrl &&
-      other.streamCount == streamCount &&
-      listEquals(other.streams, streams);
+
+    return other.id == id &&
+        other.name == name &&
+        other.url == url &&
+        other.uploaderName == uploaderName &&
+        other.uploaderAvatarUrl == uploaderAvatarUrl &&
+        other.uploaderUrl == uploaderUrl &&
+        other.bannerUrl == bannerUrl &&
+        other.thumbnailUrl == thumbnailUrl &&
+        other.streamCount == streamCount &&
+        listEquals(other.streams, streams);
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
-      name.hashCode ^
-      url.hashCode ^
-      uploaderName.hashCode ^
-      uploaderAvatarUrl.hashCode ^
-      uploaderUrl.hashCode ^
-      bannerUrl.hashCode ^
-      thumbnailUrl.hashCode ^
-      streamCount.hashCode ^
-      streams.hashCode;
+        name.hashCode ^
+        url.hashCode ^
+        uploaderName.hashCode ^
+        uploaderAvatarUrl.hashCode ^
+        uploaderUrl.hashCode ^
+        bannerUrl.hashCode ^
+        thumbnailUrl.hashCode ^
+        streamCount.hashCode ^
+        streams.hashCode;
   }
 }

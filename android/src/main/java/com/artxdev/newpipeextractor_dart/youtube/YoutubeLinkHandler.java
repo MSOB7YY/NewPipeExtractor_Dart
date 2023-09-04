@@ -7,33 +7,36 @@ import org.schabi.newpipe.extractor.services.youtube.linkHandler.YoutubeStreamLi
 
 public class YoutubeLinkHandler {
 
-    static public String getIdFromStreamUrl(String url) {
+    static public String getIdFromStreamUrl(final String url) {
         String parsedUrl = null;
         final YoutubeStreamLinkHandlerFactory streamLinkHandler =
                 YoutubeStreamLinkHandlerFactory.getInstance();
         try {
             parsedUrl = streamLinkHandler.fromUrl(url).getId();
-        } catch (ParsingException ignored) {}
+        } catch (final ParsingException ignored) {
+        }
         return parsedUrl;
     }
 
-    static public String getIdFromPlaylistUrl(String url) {
+    static public String getIdFromPlaylistUrl(final String url) {
         String parsedUrl = null;
         final YoutubePlaylistLinkHandlerFactory playlistLinkHandler =
                 YoutubePlaylistLinkHandlerFactory.getInstance();
         try {
             parsedUrl = playlistLinkHandler.fromUrl(url).getId();
-        } catch (ParsingException ignored) {}
+        } catch (final ParsingException ignored) {
+        }
         return parsedUrl;
     }
 
-    static public String getIdFromChannelUrl(String url) {
+    static public String getIdFromChannelUrl(final String url) {
         String parsedUrl = null;
         final YoutubeChannelLinkHandlerFactory channelLinkHandler =
                 YoutubeChannelLinkHandlerFactory.getInstance();
         try {
             parsedUrl = channelLinkHandler.fromUrl(url).getId();
-        } catch (ParsingException ignored) {}
+        } catch (final ParsingException ignored) {
+        }
         return parsedUrl;
     }
 

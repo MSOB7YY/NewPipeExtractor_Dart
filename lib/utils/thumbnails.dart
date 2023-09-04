@@ -1,7 +1,6 @@
 class StreamThumbnail {
-
   final String? id;
-   
+
   StreamThumbnail(this.id);
 
   String get hqdefault => "https://img.youtube.com/vi/$id/hqdefault.jpg";
@@ -10,6 +9,8 @@ class StreamThumbnail {
 
   String get sddefault => "https://img.youtube.com/vi/$id/sddefault.jpg";
 
-  String get maxresdefault => "https://img.youtube.com/vi/$id/maxresdefault.jpg";
+  String get maxresdefault =>
+      "https://img.youtube.com/vi/$id/maxresdefault.jpg";
 
+  String get lowres => 'https://img.youtube.com/vi/$id/default.jpg';
 }

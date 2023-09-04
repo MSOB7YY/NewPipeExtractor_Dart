@@ -29,18 +29,19 @@ public class YoutubeSearchExtractor {
     private SearchExtractor extractor;
     private ListExtractor.InfoItemsPage<InfoItem> itemsPage;
 
-    public Map<String, Map<Integer, Map<String, String>>> searchYoutube(String query, List<String> filters) throws Exception {
+    public Map<String, Map<Integer, Map<String, String>>> searchYoutube(final String query,
+            final List<String> filters) throws Exception {
         extractor = YouTube.getSearchExtractor(query, filters, "");
         extractor.fetchPage();
         itemsPage = extractor.getInitialPage();
-        List<InfoItem> items = itemsPage.getItems();
+        final List<InfoItem> items = itemsPage.getItems();
         return FetchData.fetchInfoItems(items);
     }
 
     public Map<String, Map<Integer, Map<String, String>>> getNextPage() throws Exception {
         if (itemsPage.hasNextPage()) {
             itemsPage = extractor.getPage(itemsPage.getNextPage());
-            List<InfoItem> items = itemsPage.getItems();
+            final List<InfoItem> items = itemsPage.getItems();
             return FetchData.fetchInfoItems(items);
         } else {
             return new HashMap<>();

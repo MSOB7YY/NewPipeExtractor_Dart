@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:newpipeextractor_dart/utils/reCaptcha.dart';
 
 // Models
 export 'models/channel.dart';
@@ -10,16 +11,24 @@ export 'models/video.dart';
 export 'models/streamSegment.dart';
 
 // InfoItems
-export 'models/infoItems/channel.dart';
-export 'models/infoItems/playlist.dart';
 export 'models/infoItems/video.dart';
 
 // Streams
-export 'models/streams/audioOnlyStream.dart';
-export 'models/streams/videoOnlyStream.dart';
-export 'models/streams/videoStream.dart';
+export 'models/streams.dart';
 
 class NewPipeExtractorDart {
-  static const MethodChannel extractorChannel =
-      const MethodChannel('newpipeextractor_dart');
+  static const MethodChannel _extractorChannel =
+      MethodChannel('newpipeextractor_dart');
+
+  static Future<dynamic> execute(String method, [dynamic arguments]) async {
+    return await _extractorChannel.invokeMethod(method, arguments);
+  }
+
+  static Future<dynamic> safeExecute(String method, [dynamic arguments]) async {
+    Future<T?> task<T>() => _extractorChannel.invokeMethod(method, arguments);
+    var info = await task();
+    // Check if we got reCaptcha needed response
+    info = await ReCaptchaPage.checkInfo(info, task);
+    return info;
+  }
 }

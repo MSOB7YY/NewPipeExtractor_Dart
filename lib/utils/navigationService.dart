@@ -9,22 +9,24 @@ class NavigationService {
     navigationKey = GlobalKey<NavigatorState>();
   }
 
-  Future<dynamic> navigateToReplacement(String _rn, String argument) async {
-    var result = await navigationKey.currentState!.pushReplacementNamed(_rn);
+  Future<dynamic> navigateToReplacement(String rn, String argument) async {
+    final result = await navigationKey.currentState!.pushReplacementNamed(rn);
     return result;
   }
 
-  Future<dynamic> navigateTo(String _rn, String argument) async {
-    var result;
-    String? currentRoute = ModalRoute.of(navigationKey.currentContext!)!.settings.name;
+  Future<dynamic> navigateTo(String rn, String argument) async {
+    dynamic result;
+    final String? currentRoute =
+        ModalRoute.of(navigationKey.currentContext!)!.settings.name;
     if (currentRoute != 'reCaptcha') {
-      result = await navigationKey.currentState!.pushNamed(_rn, arguments: argument);
+      result =
+          await navigationKey.currentState!.pushNamed(rn, arguments: argument);
     }
     return result;
   }
 
-  Future<dynamic> navigateToRoute(MaterialPageRoute _rn) async {
-    var result = await navigationKey.currentState!.push(_rn);
+  Future<dynamic> navigateToRoute(MaterialPageRoute rn) async {
+    final result = await navigationKey.currentState!.push(rn);
     return result;
   }
 

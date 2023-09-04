@@ -1,9 +1,10 @@
-import 'package:newpipeextractor_dart/models/infoItems/channel.dart';
+import 'package:newpipeextractor_dart/models/channel.dart';
+import 'package:newpipeextractor_dart/models/enums.dart';
 import 'package:newpipeextractor_dart/models/infoItems/video.dart';
+import 'package:newpipeextractor_dart/utils/stringChecker.dart';
 
 class VideoInfo {
-  
-  VideoInfo({
+  const VideoInfo({
     this.id,
     this.url,
     this.name,
@@ -12,83 +13,125 @@ class VideoInfo {
     this.uploaderAvatarUrl,
     this.uploadDate,
     this.description,
-    this.length,
+    this.duration,
     this.viewCount,
     this.likeCount,
     this.dislikeCount,
     this.category,
     this.ageLimit,
     this.tags,
-    this.thumbnailUrl
+    this.thumbnailUrl,
+    this.isUploaderVerified,
+    this.textualUploadDate,
+    this.privacy,
   });
 
   /// Video Id (ex: dQw4w9WgXcQ)
-  String? id;
+  final String? id;
 
   /// Video full Url (ex: https://www.youtube.com/watch?v=dQw4w9WgXcQ)
-  String? url;
+  final String? url;
 
   /// Video Title
-  String? name;
+  final String? name;
 
   /// Video uploader name (Channel name)
-  String? uploaderName;
+  final String? uploaderName;
 
   /// Url to the uploader Channel
-  String? uploaderUrl;
+  final String? uploaderUrl;
 
   /// Url to the uploader avatar image
-  String? uploaderAvatarUrl;
+  final String? uploaderAvatarUrl;
 
   /// Video upload date
-  String? uploadDate;
+  final String? uploadDate;
 
   /// Video description
-  String? description;
+  final String? description;
 
-  /// Video length (duration in ms)
-  int? length;
+  /// Video duration
+  final Duration? duration;
 
   /// View Count
-  int? viewCount;
+  final int? viewCount;
 
   /// Like Count
-  int? likeCount;
+  final int? likeCount;
 
   /// Dislike Count
-  int? dislikeCount;
+  final int? dislikeCount;
 
   /// Video category
-  String? category;
+  final String? category;
 
   /// Age limit (int)
-  int? ageLimit;
+  final int? ageLimit;
 
   /// Video Tags
-  String? tags;
+  final String? tags;
 
   /// Video Thumbnail Url
-  String? thumbnailUrl;
+  final String? thumbnailUrl;
+
+  final bool? isUploaderVerified;
+
+  final String? textualUploadDate;
+
+  final VideoPrivacy? privacy;
 
   /// Retrieve a new [VideoInfo] object from Map
-  static VideoInfo fromMap(Map<String, dynamic> map) {
+  factory VideoInfo.fromMap(Map<String, dynamic> map) {
     return VideoInfo(
-      id: map.containsKey('id') ? map['id'] : null,
-      url: map.containsKey('url') ? map['url'] : null,
-      name: map.containsKey('name') ? map['name'] : null,
-      uploaderName: map.containsKey('uploaderName') ? map['uploaderName'] : null,
-      uploaderAvatarUrl: map.containsKey('uploaderAvatarUrl') ? map['uploaderAvatarUrl'] : null,
-      uploaderUrl: map.containsKey('uploaderUrl') ? map['uploaderUrl'] : null,
-      uploadDate: map.containsKey('uploadDate') ? map['uploadDate'] : null,
-      description: map.containsKey('description') ? map['description']: null,
-      length: map.containsKey('length') ? int.parse(map['length']) : null,
-      viewCount: map.containsKey('viewCount') ? int.parse(map['viewCount']) : null,
-      likeCount: map.containsKey('likeCount') ? int.parse(map['likeCount']) : null,
-      dislikeCount: map.containsKey('dislikeCount') ? int.parse(map['dislikeCount']) : null,
-      category: map.containsKey('category') ? map['category'] : null,
-      ageLimit: map.containsKey('ageLimit') ? int.parse(map['ageLimit']) : null,
-      thumbnailUrl: map.containsKey('thumbnailUrl') ? map['thumbnailUrl'] : null,
+      id: map['id'],
+      url: map['url'],
+      name: map['name'],
+      uploaderName: map['uploaderName'],
+      uploaderAvatarUrl: map['uploaderAvatarUrl'],
+      uploaderUrl: map['uploaderUrl'],
+      uploadDate: map['uploadDate'],
+      description: map['description'],
+      duration: map['length'] == null
+          ? null
+          : Duration(seconds: int.tryParse(map['length']) ?? 0),
+      viewCount:
+          map['viewCount'] == null ? null : int.tryParse(map['viewCount']),
+      likeCount:
+          map['likeCount'] == null ? null : int.tryParse(map['likeCount']),
+      dislikeCount: map['dislikeCount'] == null
+          ? null
+          : int.tryParse(map['dislikeCount']),
+      category: map['category'],
+      ageLimit: map['ageLimit'] == null ? null : int.tryParse(map['ageLimit']),
+      thumbnailUrl: map['thumbnailUrl'],
+      tags: map['tags'],
+      isUploaderVerified: (map['isUploaderVerified'] as String?)?.checkTrue(),
+      textualUploadDate: map['textualUploadDate'],
+      privacy: VideoPrivacy.values.getEnum(map['privacy']),
     );
+  }
+
+  Map<String, String?> toMap() {
+    return {
+      'id': id,
+      'url': url,
+      'name': name,
+      'uploaderName': uploaderName,
+      'uploaderAvatarUrl': uploaderAvatarUrl,
+      'uploaderUrl': uploaderUrl,
+      'uploadDate': uploadDate,
+      'description': description,
+      'length': duration?.inSeconds.toString(),
+      'viewCount': viewCount?.toString(),
+      'dislikeCount': dislikeCount?.toString(),
+      'category': category,
+      'ageLimit': ageLimit.toString(),
+      'thumbnailUrl': thumbnailUrl,
+      'tags': tags,
+      'isUploaderVerified': isUploaderVerified.toString(),
+      'textualUploadDate': textualUploadDate,
+      'privacy': privacy?.name,
+    };
   }
 
   /// Generate a VideoInfo Item from StreamInfoItem
@@ -100,15 +143,21 @@ class VideoInfo {
       uploadDate: item.uploadDate,
       uploaderUrl: item.uploaderUrl,
       uploaderName: item.uploaderName,
-      length: Duration(seconds: item.duration!).inMilliseconds,
+      duration: item.duration,
       viewCount: item.viewCount,
-      thumbnailUrl: item.thumbnails?.hqdefault
+      thumbnailUrl: item.thumbnails?.hqdefault,
     );
   }
 
   /// Generate a ChannelInfoItem from this video details
-  ChannelInfoItem getChannel() {
-    return ChannelInfoItem(uploaderUrl, uploaderName, '', uploaderAvatarUrl, null, -1);
+  YoutubeChannel getChannel() {
+    return YoutubeChannel(
+      url: uploaderUrl,
+      name: uploaderName,
+      description: '',
+      thumbnailUrl: uploaderAvatarUrl,
+      subscriberCount: null,
+      streamCount: -1,
+    );
   }
-
 }
