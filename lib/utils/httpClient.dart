@@ -5,14 +5,13 @@ import 'package:newpipeextractor_dart/exceptions/requestLimitExceededException.d
 import 'package:newpipeextractor_dart/exceptions/transistentFailureException.dart';
 
 class ExtractorHttpClient {
-
   static const Map<String, String> defaultHeaders = {
     'user-agent':
         'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101 Firefox/68.0'
   };
 
   static Future<int?> getContentLength(String url) async {
-    var response = await http.head(Uri.parse(url), headers: defaultHeaders);
+    final response = await http.head(Uri.parse(url), headers: defaultHeaders);
     return int.tryParse(response.headers['content-length'] ?? '');
   }
 
@@ -23,8 +22,8 @@ class ExtractorHttpClient {
       int errorCount = 0}) async* {
     String? url = stream.url;
     var bytesCount = start;
-    var client = http.Client();
-    for (var i = start; i < stream.size; i += 9898989) {
+    final client = http.Client();
+    for (int i = start; i < stream.size; i += 9898989) {
       try {
         final request = http.Request('get', Uri.parse(url!));
         request.headers['range'] = 'bytes=$i-${i + 9898989 - 1}';
@@ -61,7 +60,7 @@ class ExtractorHttpClient {
   }
 
   static void _validateResponse(http.BaseResponse response, int statusCode) {
-    var request = response.request!;
+    final request = response.request!;
     if (request.url.host.endsWith('.google.com') &&
         request.url.path.startsWith('/sorry/')) {
       throw RequestLimitExceededException.httpRequest(response);
@@ -79,5 +78,4 @@ class ExtractorHttpClient {
       throw FatalFailureException.httpRequest(response);
     }
   }
-
 }

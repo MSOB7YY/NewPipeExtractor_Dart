@@ -110,7 +110,7 @@ class _GeneralStream {
   final String? quality;
   final int? durationMS;
   final int? samplerate;
-  final int? sizeInBytes;
+  int? sizeInBytes;
 
   _GeneralStream({
     required this.url,

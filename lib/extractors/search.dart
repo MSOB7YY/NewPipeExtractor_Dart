@@ -10,7 +10,7 @@ class SearchExtractor {
       String query, List<String> filters) async {
     final info = await NewPipeExtractorDart.safeExecute(
         "searchYoutube", {"query": query, "filters": filters});
-    var parsedList = _parseSearchResults(info);
+    final parsedList = _parseSearchResults(info);
     return YoutubeSearch(
         query: query,
         searchVideos: parsedList[0],
@@ -32,7 +32,7 @@ class SearchExtractor {
       String query, List<String> filters) async {
     final info = await NewPipeExtractorDart.safeExecute(
         "searchYoutubeMusic", {"query": query, "filters": filters});
-    var parsedList = _parseSearchResults(info);
+    final parsedList = _parseSearchResults(info);
     return YoutubeMusicSearch(
         query: query,
         searchVideos: parsedList[0],

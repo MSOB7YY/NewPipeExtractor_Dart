@@ -61,7 +61,7 @@ class YoutubeVideo {
       throw const StreamIsNull("Tried to access a null VideoOnly stream");
     }
     VideoOnlyStream? video;
-    for (var i = 0; i < videoOnlyStreams!.length; i++) {
+    for (int i = 0; i < videoOnlyStreams!.length; i++) {
       if (video == null) {
         video = videoOnlyStreams![i];
       } else {
@@ -83,7 +83,7 @@ class YoutubeVideo {
       throw const StreamIsNull("Tried to access a null Video stream");
     }
     VideoStream? video;
-    for (var i = 0; i < videoStreams!.length; i++) {
+    for (int i = 0; i < videoStreams!.length; i++) {
       if (video == null) {
         video = videoStreams![i];
       } else {
@@ -103,7 +103,7 @@ class YoutubeVideo {
       throw const StreamIsNull("Tried to access a null Audio stream");
     }
     AudioOnlyStream? audio;
-    for (var i = 0; i < audioOnlyStreams!.length; i++) {
+    for (int i = 0; i < audioOnlyStreams!.length; i++) {
       if (audio == null) {
         audio = audioOnlyStreams![i];
       } else {
@@ -123,7 +123,7 @@ class YoutubeVideo {
       throw const StreamIsNull("Tried to access a null Audio stream");
     }
     final List<AudioOnlyStream> newList = [];
-    for (var element in audioOnlyStreams!) {
+    for (final element in audioOnlyStreams!) {
       if (element.formatName == "m4a") {
         newList.add(element);
       }
@@ -132,7 +132,7 @@ class YoutubeVideo {
       return audioWithHighestQuality;
     }
     AudioOnlyStream? audio;
-    for (var i = 0; i < newList.length; i++) {
+    for (int i = 0; i < newList.length; i++) {
       if (audio == null) {
         audio = newList[i];
       } else {
@@ -152,7 +152,7 @@ class YoutubeVideo {
       throw const StreamIsNull("Tried to access a null Audio stream");
     }
     final List<AudioOnlyStream> newList = [];
-    for (var element in audioOnlyStreams!) {
+    for (final element in audioOnlyStreams!) {
       if (element.formatName == "webm") {
         newList.add(element);
       }
@@ -161,7 +161,7 @@ class YoutubeVideo {
       return audioWithHighestQuality;
     }
     AudioOnlyStream? audio;
-    for (var i = 0; i < newList.length; i++) {
+    for (int i = 0; i < newList.length; i++) {
       if (audio == null) {
         audio = newList[i];
       } else {

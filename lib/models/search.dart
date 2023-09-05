@@ -29,7 +29,7 @@ class YoutubeSearch {
   /// Get next page content and include all results
   /// in the current object of YoutubeSearch
   Future<void> getNextPage() async {
-    var newItems = await SearchExtractor.getNextPage();
+    final newItems = await SearchExtractor.getNextPage();
     searchVideos!.addAll(newItems[0] as List<StreamInfoItem>);
     searchPlaylists!.addAll(newItems[1] as List<YoutubePlaylist>);
     searchChannels!.addAll(newItems[2] as List<YoutubeChannel>);
@@ -72,7 +72,7 @@ class YoutubeMusicSearch {
   /// Get next page content and include all results
   /// in the current object of YoutubeSearch
   Future<void> getNextPage() async {
-    var newItems = await SearchExtractor.getNextMusicPage();
+    final newItems = await SearchExtractor.getNextMusicPage();
     searchVideos!.addAll(newItems[0] as List<StreamInfoItem>);
     searchPlaylists!.addAll(newItems[1] as List<YoutubePlaylist>);
     searchChannels!.addAll(newItems[2] as List<YoutubeChannel>);
