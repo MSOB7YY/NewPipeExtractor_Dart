@@ -164,6 +164,8 @@ class _GeneralStream {
     };
   }
 
+  String get bitrateText => "${(bitrate ?? 1000) ~/ 1000} kb/s";
+
   double get totalKiloBytes => (sizeInBytes ?? 0) / 1024;
 
   double get totalMegaBytes => totalKiloBytes / 1024;
