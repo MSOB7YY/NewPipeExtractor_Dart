@@ -13,6 +13,7 @@ class ReCaptchaPage extends StatefulWidget {
 
   static Future<dynamic> checkInfo(
       info, Future<dynamic> Function() task) async {
+    if (info == null) return [];
     if ((info as Map).containsKey("error")) {
       if (info["error"].contains("reCaptcha")) {
         if (!resolvingCaptcha) {

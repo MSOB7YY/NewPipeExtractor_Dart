@@ -4,6 +4,7 @@ class StreamsParser {
   /// Retrieves a list of different types of InfoItems from the method channel response map
   static List<dynamic> parseInfoItemListFromMap(info,
       {required bool singleList}) {
+    if (info == null) return [];
     if ((info as Map).containsKey("error")) {
       print(info["error"]);
       return [];
