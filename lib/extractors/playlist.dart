@@ -3,8 +3,12 @@ import 'package:newpipeextractor_dart/utils/streamsParser.dart';
 import 'package:newpipeextractor_dart/utils/stringChecker.dart';
 
 class PlaylistExtractor {
+  static PlaylistExtractor get instance => _instance;
+  static final PlaylistExtractor _instance = PlaylistExtractor._internal();
+  PlaylistExtractor._internal();
+
   /// Extract all the details of the given Playlist URL into a YoutubePlaylist object
-  static Future<YoutubePlaylist> getPlaylistDetails(String? playlistUrl) async {
+  Future<YoutubePlaylist> getPlaylistDetails(String? playlistUrl) async {
     StringChecker.ensureGoodLink(playlistUrl);
 
     final info = await NewPipeExtractorDart.safeExecute(
@@ -14,8 +18,7 @@ class PlaylistExtractor {
 
   /// Extract all the Streams from the given Playlist URL
   /// as a list of StreamInfoItem
-  static Future<List<StreamInfoItem>> getPlaylistStreams(
-      String? playlistUrl) async {
+  Future<List<StreamInfoItem>> getPlaylistStreams(String? playlistUrl) async {
     StringChecker.ensureGoodLink(playlistUrl);
 
     final info = await NewPipeExtractorDart.safeExecute(

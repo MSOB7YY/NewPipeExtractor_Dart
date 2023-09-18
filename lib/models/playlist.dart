@@ -2,10 +2,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:newpipeextractor_dart/extractors/playlist.dart';
-import 'package:newpipeextractor_dart/models/enums.dart';
-import 'package:newpipeextractor_dart/models/infoItems/video.dart';
-import 'package:newpipeextractor_dart/models/infoItems/yt_feed.dart';
+import 'package:newpipeextractor_dart/newpipeextractor_dart.dart';
 import 'package:newpipeextractor_dart/utils/stringChecker.dart';
 
 class YoutubePlaylist extends YoutubeFeed {
@@ -75,7 +72,8 @@ class YoutubePlaylist extends YoutubeFeed {
 
   /// Retrieve this Playlist list of streams (List of StreamInfoItem)
   Future<void> getStreams() async {
-    streams.addAll(await PlaylistExtractor.getPlaylistStreams(url));
+    streams
+        .addAll(await NewPipeExtractorDart.playlists.getPlaylistStreams(url));
   }
 
   YoutubePlaylist copyWith({

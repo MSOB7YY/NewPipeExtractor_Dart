@@ -2,11 +2,15 @@ import 'package:newpipeextractor_dart/newpipeextractor_dart.dart';
 import 'package:newpipeextractor_dart/utils/streamsParser.dart';
 
 class SearchExtractor {
+  static SearchExtractor get instance => _instance;
+  static final SearchExtractor _instance = SearchExtractor._internal();
+  SearchExtractor._internal();
+
   /// Search on Youtube for the provided Query, this will return
   /// a YoutubeSearch object which will contain all StreamInfoItem,
   /// PlaylistInfoItem and ChannelInfoItem found, you can then query
   /// for more results running that object [getNextPage()] function
-  static Future<YoutubeSearch> searchYoutube(
+  Future<YoutubeSearch> searchYoutube(
       String query, List<String> filters) async {
     final info = await NewPipeExtractorDart.safeExecute(
         "searchYoutube", {"query": query, "filters": filters});
@@ -19,7 +23,7 @@ class SearchExtractor {
   }
 
   /// Gets the next page of the current YoutubeSearch Query
-  static Future<List<dynamic>> getNextPage() async {
+  Future<List<dynamic>> getNextPage() async {
     final info = await NewPipeExtractorDart.safeExecute("getNextPage");
     return _parseSearchResults(info);
   }
@@ -28,7 +32,7 @@ class SearchExtractor {
   /// a YoutubeSearch object which will contain all StreamInfoItem,
   /// PlaylistInfoItem and ChannelInfoItem found, you can then query
   /// for more results running that object [getNextPage()] function
-  static Future<YoutubeMusicSearch> searchYoutubeMusic(
+  Future<YoutubeMusicSearch> searchYoutubeMusic(
       String query, List<String> filters) async {
     final info = await NewPipeExtractorDart.safeExecute(
         "searchYoutubeMusic", {"query": query, "filters": filters});
@@ -41,12 +45,12 @@ class SearchExtractor {
   }
 
   /// Gets the next page of the current YoutubeMusicSearch Query
-  static Future<List<dynamic>> getNextMusicPage() async {
+  Future<List<dynamic>> getNextMusicPage() async {
     final info = await NewPipeExtractorDart.safeExecute("getNextMusicPage");
     return _parseSearchResults(info);
   }
 
-  static List<dynamic> _parseSearchResults(info) {
+  List<dynamic> _parseSearchResults(info) {
     return StreamsParser.parseInfoItemListFromMap(info, singleList: false);
   }
 }

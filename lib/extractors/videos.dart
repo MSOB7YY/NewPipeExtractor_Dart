@@ -1,13 +1,16 @@
-import 'package:newpipeextractor_dart/models/videoInfo.dart';
 import 'package:newpipeextractor_dart/newpipeextractor_dart.dart';
 import 'package:newpipeextractor_dart/utils/streamsParser.dart';
 import 'package:newpipeextractor_dart/utils/stringChecker.dart';
 
 class VideoExtractor {
+  static VideoExtractor get instance => _instance;
+  static final VideoExtractor _instance = VideoExtractor._internal();
+  VideoExtractor._internal();
+
   /// This functions retrieves a full [YoutubeVideo] object which
   /// has all the information from that video including all Video,
   /// Audio and Muxed Streams (Muxed = Video + Audio)
-  static Future<YoutubeVideo> getStream(String? videoUrl) async {
+  Future<YoutubeVideo> getStream(String? videoUrl) async {
     StringChecker.ensureGoodLink(videoUrl);
 
     final info = await NewPipeExtractorDart.execute(
@@ -38,7 +41,7 @@ class VideoExtractor {
   }
 
   /// Retrieve only the Video Information
-  static Future<VideoInfo?> getInfo(String videoUrl) async {
+  Future<VideoInfo?> getInfo(String videoUrl) async {
     StringChecker.ensureGoodLink(videoUrl);
 
     final informationMap = await NewPipeExtractorDart.safeExecute(
@@ -53,7 +56,7 @@ class VideoExtractor {
   /// [1] AudioOnlyStreams
   /// [2] VideoStreams
   ///
-  static Future<List<dynamic>?> getMediaStreams(String videoUrl) async {
+  Future<List<dynamic>?> getMediaStreams(String videoUrl) async {
     StringChecker.ensureGoodLink(videoUrl);
 
     final info = await NewPipeExtractorDart.safeExecute(
@@ -62,8 +65,7 @@ class VideoExtractor {
   }
 
   /// Retrieve Video Only Streams
-  static Future<List<VideoOnlyStream>> getVideoOnlyStreams(
-      String videoUrl) async {
+  Future<List<VideoOnlyStream>> getVideoOnlyStreams(String videoUrl) async {
     StringChecker.ensureGoodLink(videoUrl);
 
     final info = await NewPipeExtractorDart.safeExecute(
@@ -76,8 +78,7 @@ class VideoExtractor {
   }
 
   /// Retrieve Audio Only Streams
-  static Future<List<AudioOnlyStream>> getAudioOnlyStreams(
-      String videoUrl) async {
+  Future<List<AudioOnlyStream>> getAudioOnlyStreams(String videoUrl) async {
     StringChecker.ensureGoodLink(videoUrl);
 
     final info = await NewPipeExtractorDart.safeExecute(
@@ -90,7 +91,7 @@ class VideoExtractor {
   }
 
   /// Retrieve Video Streams (Muxed = Video + Audio)
-  static Future<List<VideoStream>> getVideoStreams(String videoUrl) async {
+  Future<List<VideoStream>> getVideoStreams(String videoUrl) async {
     StringChecker.ensureGoodLink(videoUrl);
 
     final info = await NewPipeExtractorDart.safeExecute(
@@ -103,7 +104,7 @@ class VideoExtractor {
   }
 
   /// Retrieve related videos by URL
-  static Future<List<dynamic>> getRelatedStreams(String videoUrl) async {
+  Future<List<dynamic>> getRelatedStreams(String videoUrl) async {
     StringChecker.ensureGoodLink(videoUrl);
 
     final info = await NewPipeExtractorDart.safeExecute(
@@ -112,7 +113,7 @@ class VideoExtractor {
   }
 
   /// Retrieves all stream segments from video URL
-  static Future<List<StreamSegment>> getStreamSegments(String videoUrl) async {
+  Future<List<StreamSegment>> getStreamSegments(String videoUrl) async {
     StringChecker.ensureGoodLink(videoUrl);
 
     final info = await NewPipeExtractorDart.safeExecute(

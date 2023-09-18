@@ -1,7 +1,7 @@
 import 'dart:convert';
 
+import 'package:newpipeextractor_dart/newpipeextractor_dart.dart';
 import 'package:newpipeextractor_dart/utils/stringChecker.dart';
-import 'package:newpipeextractor_dart/models/infoItems/yt_feed.dart';
 
 class YoutubeChannel extends YoutubeFeed {
   /// Channel URL

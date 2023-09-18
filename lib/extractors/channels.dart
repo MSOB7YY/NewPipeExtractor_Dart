@@ -6,9 +6,13 @@ import 'package:html/parser.dart' as parser;
 import 'package:http/http.dart' as http;
 
 class ChannelExtractor {
+  static ChannelExtractor get instance => _instance;
+  static final ChannelExtractor _instance = ChannelExtractor._internal();
+  ChannelExtractor._internal();
+
   /// Retrieve all ChannelInfo and
   /// build it into our own Model
-  static Future<YoutubeChannel> channelInfo(String? url) async {
+  Future<YoutubeChannel> channelInfo(String? url) async {
     StringChecker.ensureGoodLink(url);
 
     final channel = await NewPipeExtractorDart.safeExecute(
@@ -17,7 +21,7 @@ class ChannelExtractor {
   }
 
   /// Retrieve uploads from a Channel URL
-  static Future<List<StreamInfoItem>> getChannelUploads(String url) async {
+  Future<List<StreamInfoItem>> getChannelUploads(String url) async {
     StringChecker.ensureGoodLink(url);
 
     final info = NewPipeExtractorDart.safeExecute(
@@ -26,13 +30,13 @@ class ChannelExtractor {
   }
 
   /// Retrieve next page from channel uploads
-  static Future<List<StreamInfoItem>> getChannelNextUploads() async {
+  Future<List<StreamInfoItem>> getChannelNextUploads() async {
     final info = await NewPipeExtractorDart.safeExecute('getChannelNextPage');
     return StreamsParser.parseStreamListFromMap(info);
   }
 
   /// Retrieve high quality Channel Avatar URL
-  static Future<String?> getAvatarUrl(String channelId) async {
+  Future<String?> getAvatarUrl(String channelId) async {
     final url = 'https://www.youtube.com/channel/$channelId?hl=en';
     final client = http.Client();
     final response = await client.get(Uri.parse(url),

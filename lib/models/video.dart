@@ -1,9 +1,5 @@
 import 'package:newpipeextractor_dart/exceptions/streamIsNull.dart';
-import 'package:newpipeextractor_dart/extractors/videos.dart';
-import 'package:newpipeextractor_dart/models/infoItems/video.dart';
-import 'package:newpipeextractor_dart/models/streamSegment.dart';
-import 'package:newpipeextractor_dart/models/streams.dart';
-import 'package:newpipeextractor_dart/models/videoInfo.dart';
+import 'package:newpipeextractor_dart/newpipeextractor_dart.dart';
 
 class YoutubeVideo {
   /// Video Information
@@ -52,7 +48,7 @@ class YoutubeVideo {
   /// then, this function will retrieve those streams and return a new
   /// [YoutubeVideo] object
   Future<YoutubeVideo> get getStreams async =>
-      await VideoExtractor.getStream(videoInfo.url);
+      await NewPipeExtractorDart.videos.getStream(videoInfo.url);
 
   /// Gets the best quality video only stream
   /// (By resolution, fps is not taken in consideration)

@@ -1,7 +1,4 @@
-import 'package:newpipeextractor_dart/extractors/search.dart';
-import 'package:newpipeextractor_dart/models/channel.dart';
-import 'package:newpipeextractor_dart/models/infoItems/video.dart';
-import 'package:newpipeextractor_dart/models/playlist.dart';
+import 'package:newpipeextractor_dart/newpipeextractor_dart.dart';
 
 class YoutubeSearch {
   /// SearchQuery
@@ -29,7 +26,7 @@ class YoutubeSearch {
   /// Get next page content and include all results
   /// in the current object of YoutubeSearch
   Future<void> getNextPage() async {
-    final newItems = await SearchExtractor.getNextPage();
+    final newItems = await NewPipeExtractorDart.search.getNextPage();
     searchVideos!.addAll(newItems[0] as List<StreamInfoItem>);
     searchPlaylists!.addAll(newItems[1] as List<YoutubePlaylist>);
     searchChannels!.addAll(newItems[2] as List<YoutubeChannel>);
@@ -72,7 +69,7 @@ class YoutubeMusicSearch {
   /// Get next page content and include all results
   /// in the current object of YoutubeSearch
   Future<void> getNextPage() async {
-    final newItems = await SearchExtractor.getNextMusicPage();
+    final newItems = await NewPipeExtractorDart.search.getNextMusicPage();
     searchVideos!.addAll(newItems[0] as List<StreamInfoItem>);
     searchPlaylists!.addAll(newItems[1] as List<YoutubePlaylist>);
     searchChannels!.addAll(newItems[2] as List<YoutubeChannel>);
