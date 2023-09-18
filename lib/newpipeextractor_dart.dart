@@ -8,7 +8,9 @@ import 'package:newpipeextractor_dart/extractors/playlist.dart';
 import 'package:newpipeextractor_dart/extractors/search.dart';
 import 'package:newpipeextractor_dart/extractors/trending.dart';
 import 'package:newpipeextractor_dart/extractors/videos.dart';
+import 'package:newpipeextractor_dart/utils/httpClient.dart';
 import 'package:newpipeextractor_dart/utils/reCaptcha.dart';
+import 'package:newpipeextractor_dart/utils/url.dart';
 
 // Models
 export 'models/channel.dart';
@@ -21,6 +23,7 @@ export 'models/streamSegment.dart';
 export 'models/enums.dart';
 export 'models/streams.dart';
 export 'models/videoInfo.dart';
+export 'models/thumbnails.dart';
 
 // InfoItems
 export 'models/infoItems/video.dart';
@@ -33,6 +36,8 @@ class NewPipeExtractorDart {
   static PlaylistExtractor get playlists => PlaylistExtractor.instance;
   static SearchExtractor get search => SearchExtractor.instance;
   static CommentsExtractor get comments => CommentsExtractor.instance;
+  static ExtractorHttpClient get httpClient => ExtractorHttpClient.instance;
+  static YoutubeIDUtils get idUtils => YoutubeIDUtils.instance;
 
   static const MethodChannel _extractorChannel =
       MethodChannel('newpipeextractor_dart');

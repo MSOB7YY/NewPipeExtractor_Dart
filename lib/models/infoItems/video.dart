@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:newpipeextractor_dart/models/infoItems/yt_feed.dart';
 import 'package:newpipeextractor_dart/utils/stringChecker.dart';
-import 'package:newpipeextractor_dart/utils/thumbnails.dart';
+import 'package:newpipeextractor_dart/models/thumbnails.dart';
 
 class StreamInfoItem extends YoutubeFeed {
   /// Video URL

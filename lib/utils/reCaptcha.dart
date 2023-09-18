@@ -6,7 +6,7 @@ import 'package:newpipeextractor_dart/newpipeextractor_dart.dart';
 import 'package:newpipeextractor_dart/utils/httpClient.dart';
 import 'package:newpipeextractor_dart/utils/navigationService.dart';
 
-bool resolvingCaptcha = false;
+bool _resolvingCaptcha = false;
 
 class ReCaptchaPage extends StatefulWidget {
   const ReCaptchaPage({super.key});
@@ -16,12 +16,12 @@ class ReCaptchaPage extends StatefulWidget {
     if (info == null) return [];
     if ((info as Map).containsKey("error")) {
       if (info["error"].contains("reCaptcha")) {
-        if (!resolvingCaptcha) {
-          resolvingCaptcha = true;
+        if (!_resolvingCaptcha) {
+          _resolvingCaptcha = true;
           final String url = info["error"].split(":").last.trim();
           await NavigationService.instance.navigateTo("reCaptcha", "http:$url");
           final newInfo = await task();
-          resolvingCaptcha = false;
+          _resolvingCaptcha = false;
           return newInfo;
         }
       }
