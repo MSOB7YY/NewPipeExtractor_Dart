@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -33,16 +34,16 @@ class YoutubePlaylist extends YoutubeFeed {
   /// Playlist videos ammount
   final int streamCount;
 
-  /// Playlist streams (Videos)
-  final List<StreamInfoItem> streams;
-
   final PlaylistType? playlistType;
 
   final bool? isUploaderVerified;
 
   final String? description;
 
-  const YoutubePlaylist({
+  /// Playlist streams (Videos)
+  final List<StreamInfoItem> streams;
+
+  YoutubePlaylist({
     required this.id,
     required this.name,
     required this.url,
@@ -52,11 +53,15 @@ class YoutubePlaylist extends YoutubeFeed {
     required this.bannerUrl,
     required this.thumbnailUrl,
     required this.streamCount,
-    this.streams = const <StreamInfoItem>[],
     required this.playlistType,
     required this.isUploaderVerified,
     required this.description,
-  });
+    this.streams = const <StreamInfoItem>[],
+  }) {
+    if (streams.isNotEmpty) {
+      _streamsCompleter.complete(streams);
+    }
+  }
 
   /// Transform this object into a PlaylistInfoItem which is smaller and
   /// allows saving or transporting it via Strings
@@ -70,10 +75,20 @@ class YoutubePlaylist extends YoutubeFeed {
   //   );
   // }
 
+  bool _fetchingStreams = false;
+  final _streamsCompleter = Completer<List<StreamInfoItem>>();
+
   /// Retrieve this Playlist list of streams (List of StreamInfoItem)
-  Future<void> getStreams() async {
-    streams
-        .addAll(await NewPipeExtractorDart.playlists.getPlaylistStreams(url));
+  Future<List<StreamInfoItem>> getStreams() async {
+    if (!_fetchingStreams) {
+      _fetchingStreams = true;
+      if (!_streamsCompleter.isCompleted) {
+        final s = await NewPipeExtractorDart.playlists.getPlaylistStreams(url);
+        _streamsCompleter.complete(s);
+      }
+      _fetchingStreams = false;
+    }
+    return _streamsCompleter.future;
   }
 
   YoutubePlaylist copyWith({
