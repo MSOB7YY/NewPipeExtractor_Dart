@@ -34,7 +34,7 @@ class StreamsParser {
   /// Retrieves a list of StreamInfoItem from the method channel response map
   static List<StreamInfoItem> parseStreamListFromMap(info) {
     final List<StreamInfoItem> streams = [];
-    info.forEach((_, map) {
+    info?.forEach((_, map) {
       streams.add(StreamInfoItem.fromMap(Map.from(map)));
     });
     return streams;
@@ -43,7 +43,7 @@ class StreamsParser {
   /// Retrieves a list of StreamSegment from Map
   static List<StreamSegment> parseStreamSegmentListFromMap(info) {
     final List<StreamSegment> segments = <StreamSegment>[];
-    info.forEach((_, map) {
+    info?.forEach((_, map) {
       segments.add(
         StreamSegment.fromMap(Map.from(map)),
       );

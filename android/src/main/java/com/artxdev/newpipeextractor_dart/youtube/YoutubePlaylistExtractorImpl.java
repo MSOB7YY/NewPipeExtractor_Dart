@@ -1,6 +1,7 @@
 package com.artxdev.newpipeextractor_dart.youtube;
 
 import android.util.Log;
+import org.schabi.newpipe.extractor.ListExtractor;
 import org.schabi.newpipe.extractor.localization.DateWrapper;
 import org.schabi.newpipe.extractor.playlist.PlaylistExtractor;
 import org.schabi.newpipe.extractor.services.youtube.YoutubeParsingHelper;
@@ -16,45 +17,93 @@ import static org.schabi.newpipe.extractor.ServiceList.YouTube;
 
 public class YoutubePlaylistExtractorImpl {
 
-    static private PlaylistExtractor extractor;
+    static private final HashMap<String, PlaylistExtractor> extractors = new HashMap<>();
+    static private final HashMap<String, ListExtractor.InfoItemsPage<StreamInfoItem>> currentPages = new HashMap<>();
 
     static public Map<String, String> getPlaylistDetails(final String url) throws Exception {
         Log.d("EXTRACTOR: ", "getPlaylistDetails: " + url);
         YoutubeParsingHelper.resetClientVersionAndKey();
         YoutubeParsingHelper.setNumberGenerator(new Random(1));
-        extractor = YouTube.getPlaylistExtractor(url);
-        extractor.fetchPage();
+
+        final PlaylistExtractor oldextractor = extractors.get(url);
+        if (oldextractor == null) {
+            extractors.put(url, YouTube.getPlaylistExtractor(url));
+        }
+
+        final PlaylistExtractor extractor = extractors.get(url);
         final Map<String, String> playlistDetails = new HashMap<>();
-        playlistDetails.put("name", extractor.getName());
-        playlistDetails.put("thumbnailUrl", extractor.getThumbnailUrl());
-        playlistDetails.put("bannerUrl", extractor.getBannerUrl());
-        try {
-            playlistDetails.put("uploaderName", extractor.getUploaderName());
-        } catch (final Exception e) {
-            playlistDetails.put("uploaderName", "Unknown");
+        if (extractor != null) {
+            extractor.fetchPage();
+            playlistDetails.put("name", extractor.getName());
+            playlistDetails.put("thumbnailUrl", extractor.getThumbnailUrl());
+            playlistDetails.put("bannerUrl", extractor.getBannerUrl());
+            try {
+                playlistDetails.put("uploaderName", extractor.getUploaderName());
+            } catch (final Exception e) {
+                playlistDetails.put("uploaderName", "Unknown");
+            }
+            try {
+                playlistDetails.put("uploaderAvatarUrl", extractor.getUploaderAvatarUrl());
+            } catch (final Exception e) {
+                playlistDetails.put("uploaderAvatarUrl", null);
+            }
+            try {
+                playlistDetails.put("uploaderUrl", extractor.getUploaderUrl());
+            } catch (final Exception e) {
+                playlistDetails.put("uploaderUrl", null);
+            }
+            playlistDetails.put("streamCount", String.valueOf(extractor.getStreamCount()));
+            playlistDetails.put("baseUrl", String.valueOf(extractor.getBaseUrl()));
+            playlistDetails.put("originalUrl", String.valueOf(extractor.getOriginalUrl()));
+            playlistDetails.put("id", extractor.getId());
+            playlistDetails.put("url", extractor.getUrl());
+
         }
-        try {
-            playlistDetails.put("uploaderAvatarUrl", extractor.getUploaderAvatarUrl());
-        } catch (final Exception e) {
-            playlistDetails.put("uploaderAvatarUrl", null);
-        }
-        try {
-            playlistDetails.put("uploaderUrl", extractor.getUploaderUrl());
-        } catch (final Exception e) {
-            playlistDetails.put("uploaderUrl", null);
-        }
-        playlistDetails.put("streamCount", String.valueOf(extractor.getStreamCount()));
-        playlistDetails.put("id", extractor.getId());
-        playlistDetails.put("url", extractor.getUrl());
         return playlistDetails;
+
     }
 
     static public Map<Integer, Map<String, String>> getPlaylistStreams(final String url)
             throws Exception {
-        extractor = YouTube.getPlaylistExtractor(url);
-        extractor.fetchPage();
-        final List<StreamInfoItem> items = extractor.getInitialPage().getItems();
-        return _fetchResultsFromItems(items);
+
+        final PlaylistExtractor oldextractor = extractors.get(url);
+        if (oldextractor == null) {
+            extractors.put(url, YouTube.getPlaylistExtractor(url));
+        }
+        final PlaylistExtractor extractor = extractors.get(url);
+        if (extractor != null) {
+            extractor.fetchPage();
+            currentPages.put(url, extractor.getInitialPage());
+            final List<StreamInfoItem> playlistItems = extractor.getInitialPage().getItems();
+            return _fetchResultsFromItems(playlistItems);
+        }
+        return new HashMap<>();
+    }
+
+    static public Map<Integer, Map<String, String>> getPlaylistStreamsNextPage(final String url)
+            throws Exception {
+
+        final PlaylistExtractor oldextractor = extractors.get(url);
+        if (oldextractor == null) {
+            extractors.put(url, YouTube.getPlaylistExtractor(url));
+        }
+        final PlaylistExtractor extractor = extractors.get(url);
+        final ListExtractor.InfoItemsPage<StreamInfoItem> currentPage = currentPages.get(url);
+        if (extractor != null) {
+            if (currentPage == null) {
+                return getPlaylistStreams(url);
+            } else {
+                if (currentPage.hasNextPage()) {
+                    currentPages.put(url, extractor.getPage(currentPage.getNextPage()));
+                    final List<StreamInfoItem> playlistItems = extractor.getInitialPage().getItems();
+                    return _fetchResultsFromItems(playlistItems);
+                } else {
+                    return new HashMap<>();
+                }
+            }
+        }
+
+        return new HashMap<>();
     }
 
     static private Map<Integer, Map<String, String>> _fetchResultsFromItems(

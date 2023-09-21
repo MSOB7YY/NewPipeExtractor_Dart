@@ -57,11 +57,7 @@ class YoutubePlaylist extends YoutubeFeed {
     required this.isUploaderVerified,
     required this.description,
     this.streams = const <StreamInfoItem>[],
-  }) {
-    if (streams.isNotEmpty) {
-      _streamsCompleter.complete(streams);
-    }
-  }
+  });
 
   /// Transform this object into a PlaylistInfoItem which is smaller and
   /// allows saving or transporting it via Strings
@@ -76,19 +72,38 @@ class YoutubePlaylist extends YoutubeFeed {
   // }
 
   bool _fetchingStreams = false;
-  final _streamsCompleter = Completer<List<StreamInfoItem>>();
+  bool _fetchingStreamsNextPage = false;
 
-  /// Retrieve this Playlist list of streams (List of StreamInfoItem)
+  /// Retrieve this Playlist list of streams (List of StreamInfoItem).
+  ///
+  /// Calling this after [getStreamsNextPage] means that
+  /// all streams that were fetched inside [streams] will be cleared.
   Future<List<StreamInfoItem>> getStreams() async {
     if (!_fetchingStreams) {
       _fetchingStreams = true;
-      if (!_streamsCompleter.isCompleted) {
-        final s = await NewPipeExtractorDart.playlists.getPlaylistStreams(url);
-        _streamsCompleter.complete(s);
-      }
+      final s = await NewPipeExtractorDart.playlists.getPlaylistStreams(url);
+      streams
+        ..clear()
+        ..addAll(s);
       _fetchingStreams = false;
+      return s;
     }
-    return _streamsCompleter.future;
+    return [];
+  }
+
+  /// This will fetch the next streams, or initial if there was none before
+  ///
+  /// i.e. no need to call [getStreams] first.
+  Future<List<StreamInfoItem>> getStreamsNextPage() async {
+    if (!_fetchingStreamsNextPage) {
+      _fetchingStreamsNextPage = true;
+      final s =
+          await NewPipeExtractorDart.playlists.getPlaylistStreamsNextPage(url);
+      streams.addAll(s);
+      _fetchingStreamsNextPage = false;
+      return s;
+    }
+    return [];
   }
 
   YoutubePlaylist copyWith({

@@ -25,4 +25,13 @@ class PlaylistExtractor {
         "getPlaylistStreams", {"playlistUrl": playlistUrl});
     return StreamsParser.parseStreamListFromMap(info);
   }
+
+  Future<List<StreamInfoItem>> getPlaylistStreamsNextPage(
+      String? playlistUrl) async {
+    StringChecker.ensureGoodLink(playlistUrl);
+
+    final info = await NewPipeExtractorDart.safeExecute(
+        "getPlaylistStreamsNextPage", {"playlistUrl": playlistUrl});
+    return StreamsParser.parseStreamListFromMap(info);
+  }
 }

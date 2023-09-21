@@ -292,6 +292,16 @@ public class NewpipeextractorDartPlugin implements FlutterPlugin, MethodCallHand
             info[0].put("error", e.getMessage());
           }
         }
+        // Get streams from a Playlist next page
+        if (method.equals("getPlaylistStreamsNextPage")) {
+          final String playlistUrl = call.argument("playlistUrl");
+          try {
+            info[0] = YoutubePlaylistExtractorImpl.getPlaylistStreamsNextPage(playlistUrl);
+          } catch (final Exception e) {
+            e.printStackTrace();
+            info[0].put("error", e.getMessage());
+          }
+        }
 
         // Get all Streams from a Channel URL
         if (method.equals("getChannelUploads")) {

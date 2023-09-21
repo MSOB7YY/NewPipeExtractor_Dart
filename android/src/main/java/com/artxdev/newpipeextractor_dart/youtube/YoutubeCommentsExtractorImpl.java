@@ -1,7 +1,6 @@
 package com.artxdev.newpipeextractor_dart.youtube;
 
 import org.schabi.newpipe.extractor.ListExtractor;
-import org.schabi.newpipe.extractor.ListExtractor.InfoItemsPage;
 import org.schabi.newpipe.extractor.comments.CommentsInfoItem;
 import org.schabi.newpipe.extractor.localization.DateWrapper;
 import org.schabi.newpipe.extractor.services.youtube.extractors.YoutubeCommentsExtractor;
@@ -24,8 +23,7 @@ public class YoutubeCommentsExtractorImpl {
         extractor = (YoutubeCommentsExtractor) YouTube.getCommentsExtractor(url);
         extractor.fetchPage();
         currentPage = extractor.getInitialPage();
-        final InfoItemsPage<CommentsInfoItem> commentsInfo = extractor.getInitialPage();
-        final List<CommentsInfoItem> comments = commentsInfo.getItems();
+        final List<CommentsInfoItem> comments = currentPage.getItems();
 
         return parseData(comments);
     }
