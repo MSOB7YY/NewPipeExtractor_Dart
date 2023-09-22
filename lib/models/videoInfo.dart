@@ -146,6 +146,9 @@ class VideoInfo {
       duration: item.duration,
       viewCount: item.viewCount,
       thumbnailUrl: item.thumbnails?.hqdefault,
+      description: item.shortDescription,
+      uploaderAvatarUrl: item.uploaderAvatarUrl,
+      isUploaderVerified: item.isUploaderVerified,
     );
   }
 
