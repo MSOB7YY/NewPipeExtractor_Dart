@@ -73,7 +73,7 @@ public class YoutubePlaylistExtractorImpl {
         final PlaylistExtractor extractor = extractors.get(url);
         if (extractor != null) {
             extractor.fetchPage();
-            currentPages.put(url, extractor.getInitialPage());
+            currentPages.put(extractor.getId(), extractor.getInitialPage());
             final List<StreamInfoItem> playlistItems = extractor.getInitialPage().getItems();
             return _fetchResultsFromItems(playlistItems);
         }
@@ -88,14 +88,15 @@ public class YoutubePlaylistExtractorImpl {
             extractors.put(url, YouTube.getPlaylistExtractor(url));
         }
         final PlaylistExtractor extractor = extractors.get(url);
-        final ListExtractor.InfoItemsPage<StreamInfoItem> currentPage = currentPages.get(url);
         if (extractor != null) {
+            final ListExtractor.InfoItemsPage<StreamInfoItem> currentPage = currentPages.get(extractor.getId());
             if (currentPage == null) {
                 return getPlaylistStreams(url);
             } else {
                 if (currentPage.hasNextPage()) {
-                    currentPages.put(url, extractor.getPage(currentPage.getNextPage()));
-                    final List<StreamInfoItem> playlistItems = extractor.getInitialPage().getItems();
+                    final ListExtractor.InfoItemsPage<StreamInfoItem> nextPage = extractor.getPage(currentPage.getNextPage());
+                    currentPages.put(extractor.getId(), nextPage);
+                    final List<StreamInfoItem> playlistItems = nextPage.getItems();
                     return _fetchResultsFromItems(playlistItems);
                 } else {
                     return new HashMap<>();
