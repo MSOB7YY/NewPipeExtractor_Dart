@@ -1,6 +1,6 @@
 import 'package:newpipeextractor_dart/models/channel.dart';
 import 'package:newpipeextractor_dart/models/enums.dart';
-import 'package:newpipeextractor_dart/models/infoItems/video.dart';
+import 'package:newpipeextractor_dart/models/stream_info_item.dart';
 import 'package:newpipeextractor_dart/utils/stringChecker.dart';
 
 class VideoInfo {
@@ -11,7 +11,8 @@ class VideoInfo {
     this.uploaderName,
     this.uploaderUrl,
     this.uploaderAvatarUrl,
-    this.uploadDate,
+    this.date,
+    this.isDateApproximation,
     this.description,
     this.duration,
     this.viewCount,
@@ -23,7 +24,9 @@ class VideoInfo {
     this.thumbnailUrl,
     this.isUploaderVerified,
     this.textualUploadDate,
+    this.uploaderSubscriberCount,
     this.privacy,
+    this.isShortFormContent,
   });
 
   /// Video Id (ex: dQw4w9WgXcQ)
@@ -45,7 +48,9 @@ class VideoInfo {
   final String? uploaderAvatarUrl;
 
   /// Video upload date
-  final String? uploadDate;
+  final DateTime? date;
+
+  final bool? isDateApproximation;
 
   /// Video description
   final String? description;
@@ -78,6 +83,10 @@ class VideoInfo {
 
   final String? textualUploadDate;
 
+  final int? uploaderSubscriberCount;
+
+  final bool? isShortFormContent;
+
   final VideoPrivacy? privacy;
 
   /// Retrieve a new [VideoInfo] object from Map
@@ -89,7 +98,8 @@ class VideoInfo {
       uploaderName: map['uploaderName'],
       uploaderAvatarUrl: map['uploaderAvatarUrl'],
       uploaderUrl: map['uploaderUrl'],
-      uploadDate: map['uploadDate'],
+      date: (map['date'] as String?)?.getDateTimeFromMSSEString(),
+      isDateApproximation: (map["isDateApproximation"] as String?)?.checkTrue(),
       description: map['description'],
       duration: map['length'] == null
           ? null
@@ -106,7 +116,10 @@ class VideoInfo {
       thumbnailUrl: map['thumbnailUrl'],
       tags: map['tags'],
       isUploaderVerified: (map['isUploaderVerified'] as String?)?.checkTrue(),
+      isShortFormContent: (map['isShortFormContent'] as String?)?.checkTrue(),
       textualUploadDate: map['textualUploadDate'],
+      uploaderSubscriberCount:
+          int.tryParse(map['uploaderSubscriberCount'] ?? ''),
       privacy: VideoPrivacy.values.getEnum(map['privacy']),
     );
   }
@@ -119,7 +132,8 @@ class VideoInfo {
       'uploaderName': uploaderName,
       'uploaderAvatarUrl': uploaderAvatarUrl,
       'uploaderUrl': uploaderUrl,
-      'uploadDate': uploadDate,
+      'date': date?.millisecondsSinceEpoch.toString(),
+      'isDateApproximation': isDateApproximation.toString(),
       'description': description,
       'length': duration?.inSeconds.toString(),
       'viewCount': viewCount?.toString(),
@@ -129,7 +143,9 @@ class VideoInfo {
       'thumbnailUrl': thumbnailUrl,
       'tags': tags,
       'isUploaderVerified': isUploaderVerified.toString(),
+      'isShortFormContent': isShortFormContent.toString(),
       'textualUploadDate': textualUploadDate,
+      'uploaderSubscriberCount': uploaderSubscriberCount.toString(),
       'privacy': privacy?.name,
     };
   }
@@ -140,7 +156,7 @@ class VideoInfo {
       id: item.id,
       url: item.url,
       name: item.name,
-      uploadDate: item.uploadDate,
+      date: item.date,
       uploaderUrl: item.uploaderUrl,
       uploaderName: item.uploaderName,
       duration: item.duration,

@@ -26,8 +26,8 @@ export 'models/videoInfo.dart';
 export 'models/thumbnails.dart';
 
 // InfoItems
-export 'models/infoItems/video.dart';
-export 'models/infoItems/yt_feed.dart';
+export 'models/stream_info_item.dart';
+export 'models/yt_feed.dart';
 
 class NewPipeExtractorDart {
   static VideoExtractor get videos => VideoExtractor.instance;

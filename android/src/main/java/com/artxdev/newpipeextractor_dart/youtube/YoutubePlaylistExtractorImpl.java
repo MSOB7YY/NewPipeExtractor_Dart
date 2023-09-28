@@ -1,13 +1,12 @@
 package com.artxdev.newpipeextractor_dart.youtube;
 
 import android.util.Log;
+import com.artxdev.newpipeextractor_dart.FetchData;
 import org.schabi.newpipe.extractor.ListExtractor;
-import org.schabi.newpipe.extractor.localization.DateWrapper;
 import org.schabi.newpipe.extractor.playlist.PlaylistExtractor;
 import org.schabi.newpipe.extractor.services.youtube.YoutubeParsingHelper;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,7 +93,8 @@ public class YoutubePlaylistExtractorImpl {
                 return getPlaylistStreams(url);
             } else {
                 if (currentPage.hasNextPage()) {
-                    final ListExtractor.InfoItemsPage<StreamInfoItem> nextPage = extractor.getPage(currentPage.getNextPage());
+                    final ListExtractor.InfoItemsPage<StreamInfoItem> nextPage = extractor
+                            .getPage(currentPage.getNextPage());
                     currentPages.put(extractor.getId(), nextPage);
                     final List<StreamInfoItem> playlistItems = nextPage.getItems();
                     return _fetchResultsFromItems(playlistItems);
@@ -107,30 +107,17 @@ public class YoutubePlaylistExtractorImpl {
         return new HashMap<>();
     }
 
-    static private Map<Integer, Map<String, String>> _fetchResultsFromItems(
-            final List<StreamInfoItem> items) {
-        final Map<Integer, Map<String, String>> playlistResults = new HashMap<>();
+
+    static public Map<Integer, Map<String, String>> _fetchResultsFromItems(final List<StreamInfoItem> items) {
+        final Map<Integer, Map<String, String>> itemsMap = new HashMap<>();
         for (int i = 0; i < items.size(); i++) {
-            final Map<String, String> itemMap = new HashMap<>();
+
             final StreamInfoItem item = items.get(i);
-            itemMap.put("name", item.getName());
-            itemMap.put("uploaderName", item.getUploaderName());
-            itemMap.put("uploaderUrl", item.getUploaderUrl());
-            itemMap.put("uploadDate", item.getTextualUploadDate());
+            final Map<String, String> itemMap = FetchData.fetchStreamInfoItem(item);
 
-            final DateWrapper date = item.getUploadDate();
-            if (date != null) {
-                itemMap.put("date", date.offsetDateTime().format(DateTimeFormatter.ISO_DATE_TIME));
-            }
-
-            itemMap.put("thumbnailUrl", item.getThumbnailUrl());
-            itemMap.put("duration", String.valueOf(item.getDuration()));
-            itemMap.put("viewCount", String.valueOf(item.getViewCount()));
-            itemMap.put("url", item.getUrl());
-            itemMap.put("id", YoutubeLinkHandler.getIdFromStreamUrl(item.getUrl()));
-            playlistResults.put(i, itemMap);
+            itemsMap.put(i, itemMap);
         }
-        return playlistResults;
+        return itemsMap;
     }
 
 }

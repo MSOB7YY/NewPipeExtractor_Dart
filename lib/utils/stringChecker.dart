@@ -18,4 +18,8 @@ class StringChecker {
 
 extension JsonTrueChecker on String? {
   bool checkTrue() => this?.toLowerCase() == "true";
+  DateTime? getDateTimeFromMSSEString() {
+    final msse = this == null ? null : int.tryParse(this!);
+    return msse == null ? null : DateTime.fromMillisecondsSinceEpoch(msse);
+  }
 }

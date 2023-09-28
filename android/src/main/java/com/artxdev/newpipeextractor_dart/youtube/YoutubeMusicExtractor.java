@@ -1,5 +1,6 @@
 package com.artxdev.newpipeextractor_dart.youtube;
 
+import com.artxdev.newpipeextractor_dart.FetchData;
 import org.schabi.newpipe.extractor.InfoItem;
 import org.schabi.newpipe.extractor.ListExtractor;
 import org.schabi.newpipe.extractor.channel.ChannelInfoItem;
@@ -9,7 +10,6 @@ import org.schabi.newpipe.extractor.search.SearchExtractor;
 import org.schabi.newpipe.extractor.services.youtube.linkHandler.YoutubeSearchQueryHandlerFactory;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -84,7 +84,8 @@ public class YoutubeMusicExtractor {
 
                 final DateWrapper date = item.getUploadDate();
                 if (date != null) {
-                    itemMap.put("date", date.offsetDateTime().format(DateTimeFormatter.ISO_DATE_TIME));
+                    itemMap.put("date", FetchData.getDateString(date.offsetDateTime()));
+                    itemMap.put("isDateApproximation", String.valueOf(date.isApproximation()));
                 }
 
                 itemMap.put("thumbnailUrl", item.getThumbnailUrl());

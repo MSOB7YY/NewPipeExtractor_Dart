@@ -11,7 +11,7 @@ class YoutubeComment {
   final String? uploadDate;
 
   /// Comment upload raw
-  final String? date;
+  final DateTime? date;
 
   /// Author avatar image Url
   final String? uploaderAvatarUrl;
@@ -66,7 +66,7 @@ class YoutubeComment {
       author: map['author'],
       commentText: map['commentText'],
       uploadDate: map['uploadDate'],
-      date: map['date'],
+      date: (map['date'] as String?)?.getDateTimeFromMSSEString(),
       uploaderAvatarUrl: map['uploaderAvatarUrl'],
       uploaderUrl: map['uploaderUrl'],
       commentId: map['commentId'],
@@ -85,7 +85,7 @@ class YoutubeComment {
       'author': author,
       'commentText': commentText,
       'uploadDate': uploadDate,
-      'date': date,
+      'date': date?.millisecondsSinceEpoch.toString(),
       'uploaderAvatarUrl': uploaderAvatarUrl,
       'uploaderUrl': uploaderUrl,
       'commentId': commentId,

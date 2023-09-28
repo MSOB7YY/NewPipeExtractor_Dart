@@ -29,19 +29,22 @@ class YoutubeVideo {
   /// allows saving or transporting it via Strings
   StreamInfoItem toStreamInfoItem() {
     return StreamInfoItem(
-        url: videoInfo.url,
-        id: videoInfo.id,
-        name: videoInfo.name,
-        uploaderName: videoInfo.uploaderName,
-        uploaderUrl: videoInfo.uploaderUrl,
-        uploaderAvatarUrl: videoInfo.uploaderAvatarUrl,
-        uploadDate: videoInfo.uploadDate,
-        date: videoInfo.uploadDate,
-        length: videoInfo.duration?.inMilliseconds,
-        viewCount: videoInfo.viewCount,
-        isUploaderVerified: videoInfo.isUploaderVerified,
-        duration: videoInfo.duration,
-        shortDescription: videoInfo.description);
+      url: videoInfo.url,
+      id: videoInfo.id,
+      name: videoInfo.name,
+      uploaderName: videoInfo.uploaderName,
+      uploaderUrl: videoInfo.uploaderUrl,
+      uploaderAvatarUrl: videoInfo.uploaderAvatarUrl,
+      date: videoInfo.date,
+      isDateApproximation: videoInfo.isDateApproximation,
+      viewCount: videoInfo.viewCount,
+      isUploaderVerified: videoInfo.isUploaderVerified,
+      duration: videoInfo.duration,
+      shortDescription: videoInfo.description,
+      isShortFormContent: videoInfo.isShortFormContent,
+      textualUploadDate: videoInfo.textualUploadDate,
+      thumbnailUrl: videoInfo.thumbnailUrl,
+    );
   }
 
   /// If an instance of this object has no streams (Information only)

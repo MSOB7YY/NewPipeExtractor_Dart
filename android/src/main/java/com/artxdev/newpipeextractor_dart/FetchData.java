@@ -10,7 +10,7 @@ import org.schabi.newpipe.extractor.playlist.PlaylistInfoItem;
 import org.schabi.newpipe.extractor.services.youtube.ItagItem;
 import org.schabi.newpipe.extractor.stream.*;
 
-import java.time.format.DateTimeFormatter;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,7 +47,8 @@ public class FetchData {
         try {
             final DateWrapper date = extractor.getUploadDate();
             if (date != null) {
-                videoInformationMap.put("uploadDate", date.offsetDateTime().format(DateTimeFormatter.ISO_DATE_TIME));
+                videoInformationMap.put("date", getDateString(date.offsetDateTime()));
+                videoInformationMap.put("isDateApproximation", String.valueOf(date.isApproximation()));
             }
         } catch (final ParsingException ignored) {
         }
@@ -105,7 +106,15 @@ public class FetchData {
             videoInformationMap.put("privacy", extractor.getPrivacy().name());
         } catch (final ParsingException ignored) {
         }
+        try {
+            videoInformationMap.put("isShortFormContent", String.valueOf(extractor.isShortFormContent()));
+        } catch (final ParsingException ignored) {
+        }
         return videoInformationMap;
+    }
+
+    static public String getDateString(final OffsetDateTime date) {
+        return String.valueOf(date.toEpochSecond()*1000);
     }
 
     static public Map<String, String> fetchAudioStreamInfo(final AudioStream stream) {
@@ -179,28 +188,28 @@ public class FetchData {
 
     static public Map<String, String> fetchStreamInfoItem(final StreamInfoItem item) {
         final Map<String, String> itemMap = new HashMap<>();
-
+        itemMap.put("id", YoutubeLinkHandler.getIdFromStreamUrl(item.getUrl()));
+        itemMap.put("url", item.getUrl());
         itemMap.put("name", item.getName());
         itemMap.put("uploaderName", item.getUploaderName());
         itemMap.put("uploaderUrl", item.getUploaderUrl());
-        itemMap.put("uploadDate", item.getTextualUploadDate());
+        itemMap.put("uploaderAvatarUrl", item.getUploaderAvatarUrl());
 
         final DateWrapper date = item.getUploadDate();
         if (date != null) {
-            itemMap.put("date", date.offsetDateTime().format(DateTimeFormatter.ISO_DATE_TIME));
-        } else {
-            itemMap.put("date", null);
+            itemMap.put("date", FetchData.getDateString(date.offsetDateTime()));
+            itemMap.put("isDateApproximation", String.valueOf(date.isApproximation()));
         }
 
-        itemMap.put("thumbnailUrl", item.getThumbnailUrl());
         itemMap.put("duration", String.valueOf(item.getDuration()));
         itemMap.put("viewCount", String.valueOf(item.getViewCount()));
-        itemMap.put("url", item.getUrl());
-        itemMap.put("id", YoutubeLinkHandler.getIdFromStreamUrl(item.getUrl()));
         itemMap.put("isUploaderVerified", String.valueOf(item.isUploaderVerified()));
-
-        itemMap.put("uploaderAvatarUrl", item.getUploaderAvatarUrl());
         itemMap.put("shortDescription", item.getShortDescription());
+
+        itemMap.put("textualUploadDate", item.getTextualUploadDate());
+        itemMap.put("isShortFormContent", String.valueOf(item.isShortFormContent()));
+        itemMap.put("thumbnailUrl", item.getThumbnailUrl());
+
         return itemMap;
     }
 

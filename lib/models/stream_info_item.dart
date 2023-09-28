@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:newpipeextractor_dart/models/infoItems/yt_feed.dart';
+import 'package:newpipeextractor_dart/models/yt_feed.dart';
 import 'package:newpipeextractor_dart/utils/stringChecker.dart';
 import 'package:newpipeextractor_dart/models/thumbnails.dart';
 
@@ -23,11 +23,14 @@ class StreamInfoItem extends YoutubeFeed {
   /// Video uploader avatar url
   final String? uploaderAvatarUrl;
 
-  /// Video date
-  final String? uploadDate;
+  final String? thumbnailUrl;
 
   /// Video full date
-  final String? date;
+  final DateTime? date;
+
+  final String? textualUploadDate;
+
+  final bool? isDateApproximation;
 
   /// Video duration
   final Duration? duration;
@@ -35,10 +38,10 @@ class StreamInfoItem extends YoutubeFeed {
   /// Video view count
   final int? viewCount;
 
-  final int? length;
-
   /// uploader is verified
   final bool? isUploaderVerified;
+
+  final bool? isShortFormContent;
 
   final String? shortDescription;
 
@@ -49,12 +52,14 @@ class StreamInfoItem extends YoutubeFeed {
     required this.uploaderName,
     required this.uploaderUrl,
     required this.uploaderAvatarUrl,
-    required this.uploadDate,
+    required this.thumbnailUrl,
     required this.date,
+    required this.textualUploadDate,
+    required this.isDateApproximation,
     required this.duration,
     required this.viewCount,
-    required this.length,
     required this.isUploaderVerified,
+    required this.isShortFormContent,
     required this.shortDescription,
   });
 
@@ -82,12 +87,14 @@ class StreamInfoItem extends YoutubeFeed {
       'uploaderName': uploaderName,
       'uploaderUrl': uploaderUrl,
       'uploaderAvatarUrl': uploaderAvatarUrl,
-      'uploadDate': uploadDate,
-      'date': date,
+      'thumbnailUrl': thumbnailUrl,
+      'date': date?.millisecondsSinceEpoch.toString(),
+      'textualUploadDate': textualUploadDate,
+      'isDateApproximation': isDateApproximation.toString(),
       'duration': duration?.inSeconds.toString(),
       'viewCount': viewCount.toString(),
-      'length': length.toString(),
       'isUploaderVerified': isUploaderVerified.toString(),
+      'isShortFormContent': isShortFormContent.toString(),
       'shortDescription': shortDescription,
     };
   }
@@ -101,12 +108,14 @@ class StreamInfoItem extends YoutubeFeed {
       uploaderName: map['uploaderName'],
       uploaderUrl: map['uploaderUrl'],
       uploaderAvatarUrl: map['uploaderAvatarUrl'],
-      uploadDate: map['uploadDate'],
-      date: map['date'],
-      length: map['length'],
+      thumbnailUrl: map['thumbnailUrl'],
+      date: (map['date'] as String?)?.getDateTimeFromMSSEString(),
+      textualUploadDate: map['textualUploadDate'],
+      isDateApproximation: (map["isDateApproximation"] as String?)?.checkTrue(),
       duration: Duration(seconds: int.tryParse(map['duration'] ?? '') ?? 0),
       viewCount: int.tryParse(map['viewCount'] ?? ''),
       isUploaderVerified: (map['isUploaderVerified'] as String?)?.checkTrue(),
+      isShortFormContent: (map['isShortFormContent'] as String?)?.checkTrue(),
       shortDescription: map['shortDescription'],
     );
   }
