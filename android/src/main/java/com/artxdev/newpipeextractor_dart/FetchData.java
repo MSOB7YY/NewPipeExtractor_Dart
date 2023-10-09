@@ -11,10 +11,7 @@ import org.schabi.newpipe.extractor.services.youtube.ItagItem;
 import org.schabi.newpipe.extractor.stream.*;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class FetchData {
 
@@ -114,7 +111,7 @@ public class FetchData {
     }
 
     static public String getDateString(final OffsetDateTime date) {
-        return String.valueOf(date.toEpochSecond()*1000);
+        return String.valueOf(date.toEpochSecond() * 1000);
     }
 
     static public Map<String, String> fetchAudioStreamInfo(final AudioStream stream) {
@@ -125,23 +122,31 @@ public class FetchData {
         streamMap.put("url", stream.getUrl());
         streamMap.put("id", stream.getId());
         streamMap.put("averageBitrate", String.valueOf(stream.getAverageBitrate()));
-        streamMap.put("formatName", format.name);
-        streamMap.put("formatSuffix", format.suffix);
-        streamMap.put("formatMimeType", format.mimeType);
+        if (format != null) {
+            streamMap.put("formatName", format.name);
+            streamMap.put("formatSuffix", format.suffix);
+            streamMap.put("formatMimeType", format.mimeType);
+        }
+
 
         streamMap.put("trackName", stream.getAudioTrackName());
         if (stream.getAudioTrackType() != null) {
             streamMap.put("trackType", stream.getAudioTrackType().name());
         }
-        if (stream.getAudioLocale() != null) {
-            streamMap.put("language", stream.getAudioLocale().getLanguage());
+        try {
+            final Locale audioLocal = stream.getAudioLocale();
+            if (audioLocal != null) {
+                streamMap.put("language", audioLocal.getLanguage());
+                streamMap.put("displayLanguage", audioLocal.getDisplayLanguage());
+                streamMap.put("languageTag", audioLocal.toLanguageTag());
+                streamMap.put("country", audioLocal.getCountry());
+                streamMap.put("displayCountry", audioLocal.getDisplayCountry());
+                streamMap.put("script", audioLocal.getScript());
+                streamMap.put("displayScript", audioLocal.getDisplayScript());
+            }
+        } catch (Exception ignore) {
         }
-        streamMap.put("displayLanguage", stream.getAudioLocale().getDisplayLanguage());
-        streamMap.put("languageTag", stream.getAudioLocale().toLanguageTag());
-        streamMap.put("country", stream.getAudioLocale().getCountry());
-        streamMap.put("displayCountry", stream.getAudioLocale().getDisplayCountry());
-        streamMap.put("script", stream.getAudioLocale().getScript());
-        streamMap.put("displayScript", stream.getAudioLocale().getDisplayScript());
+
 
         streamMap.put("qualityId", String.valueOf(stream.getId()));
         streamMap.put("codec", stream.getCodec());
@@ -164,9 +169,12 @@ public class FetchData {
         streamMap.put("url", stream.getUrl());
         streamMap.put("id", stream.getId());
         streamMap.put("resolution", stream.getResolution());
-        streamMap.put("formatName", format.name);
-        streamMap.put("formatSuffix", format.suffix);
-        streamMap.put("formatMimeType", format.mimeType);
+        if (format != null) {
+            streamMap.put("formatName", format.name);
+            streamMap.put("formatSuffix", format.suffix);
+            streamMap.put("formatMimeType", format.mimeType);
+        }
+
 
         streamMap.put("qualityId", stream.getId());
         streamMap.put("fps", String.valueOf(stream.getFps()));
@@ -242,18 +250,18 @@ public class FetchData {
         final List<PlaylistInfoItem> playlistsList = new ArrayList<>();
         final List<ChannelInfoItem> channelsList = new ArrayList<>();
         final Map<String, Map<Integer, Map<String, String>>> resultsList = new HashMap<>();
-        for (int i = 0; i < items.size(); i++) {
-            switch (items.get(i).getInfoType()) {
+        for (InfoItem infoItem : items) {
+            switch (infoItem.getInfoType()) {
                 case STREAM:
-                    final StreamInfoItem streamInfo = (StreamInfoItem) items.get(i);
+                    final StreamInfoItem streamInfo = (StreamInfoItem) infoItem;
                     streamsList.add(streamInfo);
                     break;
                 case CHANNEL:
-                    final ChannelInfoItem channelInfo = (ChannelInfoItem) items.get(i);
+                    final ChannelInfoItem channelInfo = (ChannelInfoItem) infoItem;
                     channelsList.add(channelInfo);
                     break;
                 case PLAYLIST:
-                    final PlaylistInfoItem playlistInfo = (PlaylistInfoItem) items.get(i);
+                    final PlaylistInfoItem playlistInfo = (PlaylistInfoItem) infoItem;
                     playlistsList.add(playlistInfo);
                     break;
                 default:
