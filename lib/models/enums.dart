@@ -31,5 +31,6 @@ extension EnumUtils<E> on List<E> {
         (element) =>
             element.toString().split('.').last.toLowerCase() ==
             string?.toLowerCase().replaceAll('_', ''),
+        orElse: () => first,
       );
 }

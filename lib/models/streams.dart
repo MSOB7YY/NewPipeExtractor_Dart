@@ -1,6 +1,19 @@
+import 'package:newpipeextractor_dart/models/audio_track_type.dart';
+import 'package:newpipeextractor_dart/models/enums.dart';
+
 typedef VideoOnlyStream = VideoStream;
 
 class AudioOnlyStream extends _GeneralStream {
+  final String? trackName;
+  final AudioTrackType? trackType;
+  final String? language;
+  final String? displayLanguage;
+  final String? languageTag;
+  final String? country;
+  final String? displayCountry;
+  final String? script;
+  final String? displayScript;
+
   AudioOnlyStream({
     required super.url,
     required super.id,
@@ -15,6 +28,15 @@ class AudioOnlyStream extends _GeneralStream {
     required super.durationMS,
     required super.samplerate,
     required super.sizeInBytes,
+    required this.trackName,
+    required this.trackType,
+    required this.language,
+    required this.displayLanguage,
+    required this.languageTag,
+    required this.country,
+    required this.displayCountry,
+    required this.script,
+    required this.displayScript,
   });
 
   factory AudioOnlyStream.fromMap(Map<dynamic, dynamic> map) {
@@ -33,6 +55,15 @@ class AudioOnlyStream extends _GeneralStream {
       durationMS: info.durationMS,
       samplerate: info.samplerate,
       sizeInBytes: info.sizeInBytes,
+      trackName: map["trackName"],
+      trackType: AudioTrackType.values.getEnum(map['trackType']),
+      language: map["language"],
+      displayLanguage: map["displayLanguage"],
+      languageTag: map["languageTag"],
+      country: map["country"],
+      displayCountry: map["displayCountry"],
+      script: map["script"],
+      displayScript: map["displayScript"],
     );
   }
 }

@@ -129,6 +129,20 @@ public class FetchData {
         streamMap.put("formatSuffix", format.suffix);
         streamMap.put("formatMimeType", format.mimeType);
 
+        streamMap.put("trackName", stream.getAudioTrackName());
+        if (stream.getAudioTrackType() != null) {
+            streamMap.put("trackType", stream.getAudioTrackType().name());
+        }
+        if (stream.getAudioLocale() != null) {
+            streamMap.put("language", stream.getAudioLocale().getLanguage());
+        }
+        streamMap.put("displayLanguage", stream.getAudioLocale().getDisplayLanguage());
+        streamMap.put("languageTag", stream.getAudioLocale().toLanguageTag());
+        streamMap.put("country", stream.getAudioLocale().getCountry());
+        streamMap.put("displayCountry", stream.getAudioLocale().getDisplayCountry());
+        streamMap.put("script", stream.getAudioLocale().getScript());
+        streamMap.put("displayScript", stream.getAudioLocale().getDisplayScript());
+
         streamMap.put("qualityId", String.valueOf(stream.getId()));
         streamMap.put("codec", stream.getCodec());
         streamMap.put("bitrate", String.valueOf(stream.getBitrate()));
