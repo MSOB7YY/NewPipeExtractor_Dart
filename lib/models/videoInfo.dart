@@ -101,16 +101,10 @@ class VideoInfo {
       date: (map['date'] as String?)?.getDateTimeFromMSSEString(),
       isDateApproximation: (map["isDateApproximation"] as String?)?.checkTrue(),
       description: map['description'],
-      duration: map['length'] == null
-          ? null
-          : Duration(seconds: int.tryParse(map['length']) ?? 0),
-      viewCount:
-          map['viewCount'] == null ? null : int.tryParse(map['viewCount']),
-      likeCount:
-          map['likeCount'] == null ? null : int.tryParse(map['likeCount']),
-      dislikeCount: map['dislikeCount'] == null
-          ? null
-          : int.tryParse(map['dislikeCount']),
+      duration: map['length'] == null ? null : Duration(seconds: int.tryParse(map['length']) ?? 0),
+      viewCount: map['viewCount'] == null ? null : int.tryParse(map['viewCount']),
+      likeCount: map['likeCount'] == null ? null : int.tryParse(map['likeCount']),
+      dislikeCount: map['dislikeCount'] == null ? null : int.tryParse(map['dislikeCount']),
       category: map['category'],
       ageLimit: map['ageLimit'] == null ? null : int.tryParse(map['ageLimit']),
       thumbnailUrl: map['thumbnailUrl'],
@@ -118,8 +112,7 @@ class VideoInfo {
       isUploaderVerified: (map['isUploaderVerified'] as String?)?.checkTrue(),
       isShortFormContent: (map['isShortFormContent'] as String?)?.checkTrue(),
       textualUploadDate: map['textualUploadDate'],
-      uploaderSubscriberCount:
-          int.tryParse(map['uploaderSubscriberCount'] ?? ''),
+      uploaderSubscriberCount: int.tryParse(map['uploaderSubscriberCount'] ?? ''),
       privacy: VideoPrivacy.values.getEnum(map['privacy']),
     );
   }
@@ -137,6 +130,7 @@ class VideoInfo {
       'description': description,
       'length': duration?.inSeconds.toString(),
       'viewCount': viewCount?.toString(),
+      'likeCount': likeCount?.toString(),
       'dislikeCount': dislikeCount?.toString(),
       'category': category,
       'ageLimit': ageLimit.toString(),
