@@ -120,10 +120,10 @@ class VideoStream extends _GeneralStream {
   @override
   Map<String, dynamic> toMap() {
     final initial = super.toMap();
-    initial['resolution'] = resolution;
-    initial['fps'] = fps;
-    initial['height'] = height;
-    initial['width'] = width;
+    initial['resolution'] = resolution.toString();
+    initial['fps'] = fps.toString();
+    initial['height'] = height.toString();
+    initial['width'] = width.toString();
     return initial;
   }
 }
@@ -181,17 +181,17 @@ class _GeneralStream {
     return {
       'url': url,
       'id': id,
-      'averageBitrate': averageBitrate,
-      'bitrate': bitrate,
+      'averageBitrate': averageBitrate.toString(),
+      'bitrate': bitrate.toString(),
       'formatName': formatName,
       'formatSuffix': formatSuffix,
       'formatMimeType': formatMimeType,
       'qualityId': qualityId,
       'codec': codec,
       'quality': quality,
-      'durationMS': durationMS,
-      'samplerate': samplerate,
-      'length': sizeInBytes,
+      'durationMS': durationMS.toString(),
+      'samplerate': samplerate.toString(),
+      'length': sizeInBytes.toString(),
     };
   }
 
