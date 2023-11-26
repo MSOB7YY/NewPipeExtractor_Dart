@@ -6,6 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:newpipeextractor_dart/newpipeextractor_dart.dart';
 import 'package:newpipeextractor_dart/utils/stringChecker.dart';
 
+final _playlistStreamsLookupMap = <String, List<StreamInfoItem>>{};
+
 class YoutubePlaylist extends YoutubeFeed {
   /// Playlist ID
   final String? id;
@@ -40,9 +42,6 @@ class YoutubePlaylist extends YoutubeFeed {
 
   final String? description;
 
-  /// Playlist streams (Videos)
-  final List<StreamInfoItem> streams;
-
   YoutubePlaylist({
     required this.id,
     required this.name,
@@ -56,8 +55,21 @@ class YoutubePlaylist extends YoutubeFeed {
     required this.playlistType,
     required this.isUploaderVerified,
     required this.description,
-    this.streams = const <StreamInfoItem>[],
-  });
+    List<StreamInfoItem> streams = const <StreamInfoItem>[],
+  }) {
+    if (_lookupKey != null) _playlistStreamsLookupMap[_lookupKey!] = streams;
+  }
+
+  String? get _lookupKey => url;
+
+  List<StreamInfoItem> get streams => _lookupKey == null ? [] : _playlistStreamsLookupMap[_lookupKey] ?? [];
+
+  void clearCachedStreams() {
+    if (_lookupKey != null) {
+      _playlistStreamsLookupMap[_lookupKey]?.clear();
+      _playlistStreamsLookupMap.remove(_lookupKey);
+    }
+  }
 
   /// Transform this object into a PlaylistInfoItem which is smaller and
   /// allows saving or transporting it via Strings
@@ -81,6 +93,7 @@ class YoutubePlaylist extends YoutubeFeed {
   Future<List<StreamInfoItem>> getStreams() async {
     if (!_fetchingStreams) {
       _fetchingStreams = true;
+      clearCachedStreams();
       final s = await NewPipeExtractorDart.playlists.getPlaylistStreams(url);
       streams
         ..clear()
@@ -97,8 +110,7 @@ class YoutubePlaylist extends YoutubeFeed {
   Future<List<StreamInfoItem>> getStreamsNextPage() async {
     if (!_fetchingStreamsNextPage) {
       _fetchingStreamsNextPage = true;
-      final s =
-          await NewPipeExtractorDart.playlists.getPlaylistStreamsNextPage(url);
+      final s = await NewPipeExtractorDart.playlists.getPlaylistStreamsNextPage(url);
       streams.addAll(s);
       _fetchingStreamsNextPage = false;
       return s;
@@ -168,9 +180,7 @@ class YoutubePlaylist extends YoutubeFeed {
       thumbnailUrl: map['thumbnailUrl'] as String?,
       streamCount: int.tryParse(map['streamCount'] ?? '') ?? 0,
       streams: List<StreamInfoItem>.from(
-        (map['streams'] as List?)?.map(
-                (x) => StreamInfoItem.fromMap(x as Map<String, dynamic>)) ??
-            [],
+        (map['streams'] as List?)?.map((x) => StreamInfoItem.fromMap(x as Map<String, dynamic>)) ?? [],
       ),
       playlistType: PlaylistType.values.getEnum(map['playlistType']),
       isUploaderVerified: (map['isUploaderVerified'] as String?)?.checkTrue(),
@@ -180,8 +190,7 @@ class YoutubePlaylist extends YoutubeFeed {
 
   String toJson() => json.encode(toMap());
 
-  factory YoutubePlaylist.fromJson(String source) =>
-      YoutubePlaylist.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory YoutubePlaylist.fromJson(String source) => YoutubePlaylist.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {

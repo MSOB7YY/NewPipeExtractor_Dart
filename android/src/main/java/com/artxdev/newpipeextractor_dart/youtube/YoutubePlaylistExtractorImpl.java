@@ -52,8 +52,8 @@ public class YoutubePlaylistExtractorImpl {
                 playlistDetails.put("uploaderUrl", null);
             }
             playlistDetails.put("streamCount", String.valueOf(extractor.getStreamCount()));
-            playlistDetails.put("baseUrl", String.valueOf(extractor.getBaseUrl()));
-            playlistDetails.put("originalUrl", String.valueOf(extractor.getOriginalUrl()));
+            playlistDetails.put("baseUrl", extractor.getBaseUrl());
+            playlistDetails.put("originalUrl", extractor.getOriginalUrl());
             playlistDetails.put("id", extractor.getId());
             playlistDetails.put("url", extractor.getUrl());
 
@@ -65,11 +65,9 @@ public class YoutubePlaylistExtractorImpl {
     static public Map<Integer, Map<String, String>> getPlaylistStreams(final String url)
             throws Exception {
 
-        final PlaylistExtractor oldextractor = extractors.get(url);
-        if (oldextractor == null) {
-            extractors.put(url, YouTube.getPlaylistExtractor(url));
-        }
-        final PlaylistExtractor extractor = extractors.get(url);
+        extractors.remove(url);
+        final PlaylistExtractor extractor = extractors.put(url, YouTube.getPlaylistExtractor(url));
+
         if (extractor != null) {
             extractor.fetchPage();
             currentPages.put(extractor.getId(), extractor.getInitialPage());
