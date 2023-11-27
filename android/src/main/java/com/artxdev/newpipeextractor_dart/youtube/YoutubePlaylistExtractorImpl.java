@@ -64,10 +64,11 @@ public class YoutubePlaylistExtractorImpl {
 
     static public Map<Integer, Map<String, String>> getPlaylistStreams(final String url)
             throws Exception {
-
-        extractors.remove(url);
-        final PlaylistExtractor extractor = extractors.put(url, YouTube.getPlaylistExtractor(url));
-
+        final PlaylistExtractor oldextractor = extractors.get(url);
+        if (oldextractor == null) {
+            extractors.put(url, YouTube.getPlaylistExtractor(url));
+        }
+        final PlaylistExtractor extractor = extractors.get(url);
         if (extractor != null) {
             extractor.fetchPage();
             currentPages.put(extractor.getId(), extractor.getInitialPage());
@@ -75,6 +76,7 @@ public class YoutubePlaylistExtractorImpl {
             return _fetchResultsFromItems(playlistItems);
         }
         return new HashMap<>();
+
     }
 
     static public Map<Integer, Map<String, String>> getPlaylistStreamsNextPage(final String url)

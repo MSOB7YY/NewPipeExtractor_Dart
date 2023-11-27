@@ -60,9 +60,14 @@ class YoutubePlaylist extends YoutubeFeed {
     if (_lookupKey != null) _playlistStreamsLookupMap[_lookupKey!] = streams;
   }
 
-  String? get _lookupKey => url;
+  String? get _lookupKey => id;
 
-  List<StreamInfoItem> get streams => _lookupKey == null ? [] : _playlistStreamsLookupMap[_lookupKey] ?? [];
+  List<StreamInfoItem> get streams {
+    final k = _lookupKey;
+    if (k == null) return [];
+    _playlistStreamsLookupMap[k] ??= [];
+    return _playlistStreamsLookupMap[k]!;
+  }
 
   void clearCachedStreams() {
     if (_lookupKey != null) {
