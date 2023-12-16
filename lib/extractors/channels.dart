@@ -24,7 +24,7 @@ class ChannelExtractor {
   Future<List<StreamInfoItem>> getChannelUploads(String url) async {
     StringChecker.ensureGoodLink(url);
 
-    final info = NewPipeExtractorDart.safeExecute(
+    final info = await NewPipeExtractorDart.safeExecute(
         'getChannelUploads', {"channelUrl": url});
     return StreamsParser.parseStreamListFromMap(info);
   }
