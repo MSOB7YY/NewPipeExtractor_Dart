@@ -24,7 +24,7 @@ public class YoutubeMusicExtractor {
     private ListExtractor.InfoItemsPage<InfoItem> itemsPage;
 
     public Map<String, Map<Integer, Map<String, String>>> searchYoutube(final String query,
-            final List<String> filters) throws Exception {
+                                                                        final List<String> filters) throws Exception {
         final List<String> contentFilter = singletonList(YoutubeSearchQueryHandlerFactory.MUSIC_SONGS);
         if (filters != null) {
             contentFilter.addAll(filters);
@@ -88,7 +88,7 @@ public class YoutubeMusicExtractor {
                     itemMap.put("isDateApproximation", String.valueOf(date.isApproximation()));
                 }
 
-                itemMap.put("thumbnailUrl", item.getThumbnailUrl());
+                itemMap.put("thumbnailUrl", FetchData.getBestImage(item.getThumbnails()).getUrl());
                 itemMap.put("duration", String.valueOf(item.getDuration()));
                 itemMap.put("viewCount", String.valueOf(item.getViewCount()));
                 itemMap.put("url", item.getUrl());
@@ -105,7 +105,7 @@ public class YoutubeMusicExtractor {
                 final Map<String, String> itemMap = new HashMap<>();
                 final ChannelInfoItem item = channelsList.get(i);
                 itemMap.put("name", item.getName());
-                itemMap.put("thumbnailUrl", item.getThumbnailUrl());
+                itemMap.put("thumbnailUrl", FetchData.getBestImage(item.getThumbnails()).getUrl());
                 itemMap.put("url", item.getUrl());
                 itemMap.put("id", YoutubeLinkHandler.getIdFromChannelUrl(item.getUrl()));
                 itemMap.put("description", item.getDescription());
@@ -126,7 +126,7 @@ public class YoutubeMusicExtractor {
                 itemMap.put("uploaderName", item.getUploaderName());
                 itemMap.put("url", item.getUrl());
                 itemMap.put("id", YoutubeLinkHandler.getIdFromPlaylistUrl(item.getUrl()));
-                itemMap.put("thumbnailUrl", item.getThumbnailUrl());
+                itemMap.put("thumbnailUrl", FetchData.getBestImage(item.getThumbnails()).getUrl());
                 itemMap.put("streamCount", String.valueOf(item.getStreamCount()));
                 playlistResultsMap.put(i, itemMap);
             }

@@ -54,7 +54,7 @@ public class YoutubeCommentsExtractorImpl {
             itemMap.put("commentId", item.getCommentId());
             itemMap.put("author", item.getUploaderName());
             itemMap.put("commentText", item.getCommentText().getContent());
-            itemMap.put("uploaderAvatarUrl", item.getUploaderAvatarUrl());
+            itemMap.put("uploaderAvatarUrl", FetchData.getBestImage(item.getUploaderAvatars()).getUrl());
             itemMap.put("uploadDate", item.getTextualUploadDate());
             itemMap.put("uploaderUrl", item.getUploaderUrl());
             itemMap.put("likeCount", String.valueOf(item.getLikeCount()));
@@ -71,7 +71,7 @@ public class YoutubeCommentsExtractorImpl {
                 itemMap.put("isDateApproximation", String.valueOf(date.isApproximation()));
             }
 
-            itemMap.put("thumbnailUrl", item.getThumbnailUrl());
+            itemMap.put("thumbnailUrl", FetchData.getBestImage(item.getThumbnails()).getUrl());
             itemMap.put("url", item.getUrl());
             itemsMap.put(i, itemMap);
         }

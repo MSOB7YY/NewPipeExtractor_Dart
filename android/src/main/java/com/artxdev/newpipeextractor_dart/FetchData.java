@@ -38,7 +38,7 @@ public class FetchData {
         } catch (final ParsingException ignored) {
         }
         try {
-            videoInformationMap.put("uploaderAvatarUrl", extractor.getUploaderAvatarUrl());
+            videoInformationMap.put("uploaderAvatarUrl", getBestImage(extractor.getUploaderAvatars()).getUrl());
         } catch (final ParsingException ignored) {
         }
         try {
@@ -82,7 +82,7 @@ public class FetchData {
         } catch (final ParsingException ignored) {
         }
         try {
-            videoInformationMap.put("thumbnailUrl", extractor.getThumbnailUrl());
+            videoInformationMap.put("thumbnailUrl", getBestImage(extractor.getThumbnails()).getUrl());
         } catch (final ParsingException ignored) {
         }
         try {
@@ -200,11 +200,11 @@ public class FetchData {
         itemMap.put("uploaderUrl", item.getUploaderUrl());
         itemMap.put("url", item.getUrl());
         itemMap.put("id", YoutubeLinkHandler.getIdFromPlaylistUrl(item.getUrl()));
-        itemMap.put("thumbnailUrl", item.getThumbnailUrl());
+        itemMap.put("thumbnailUrl", getBestImage(item.getThumbnails()).getUrl());
         itemMap.put("streamCount", String.valueOf(item.getStreamCount()));
         itemMap.put("playlistType", item.getPlaylistType().name());
         itemMap.put("isUploaderVerified", String.valueOf(item.isUploaderVerified()));
-        itemMap.put("description", item.getDescription().getContent());
+//        itemMap.put("description", item.getDescription().getContent());
         return itemMap;
     }
 
@@ -215,7 +215,7 @@ public class FetchData {
         itemMap.put("name", item.getName());
         itemMap.put("uploaderName", item.getUploaderName());
         itemMap.put("uploaderUrl", item.getUploaderUrl());
-        itemMap.put("uploaderAvatarUrl", item.getUploaderAvatarUrl());
+        itemMap.put("uploaderAvatarUrl", getBestImage(item.getUploaderAvatars()).getUrl());
 
         final DateWrapper date = item.getUploadDate();
         if (date != null) {
@@ -230,7 +230,7 @@ public class FetchData {
 
         itemMap.put("textualUploadDate", item.getTextualUploadDate());
         itemMap.put("isShortFormContent", String.valueOf(item.isShortFormContent()));
-        itemMap.put("thumbnailUrl", item.getThumbnailUrl());
+        itemMap.put("thumbnailUrl", getBestImage(item.getThumbnails()).getUrl());
 
         return itemMap;
     }
@@ -286,7 +286,7 @@ public class FetchData {
                 final Map<String, String> itemMap = new HashMap<>();
                 final ChannelInfoItem item = channelsList.get(i);
                 itemMap.put("name", item.getName());
-                itemMap.put("thumbnailUrl", item.getThumbnailUrl());
+                itemMap.put("thumbnailUrl", getBestImage(item.getThumbnails()).getUrl());
                 itemMap.put("url", item.getUrl());
                 itemMap.put("id", YoutubeLinkHandler.getIdFromChannelUrl(item.getUrl()));
                 itemMap.put("description", item.getDescription());
@@ -310,4 +310,10 @@ public class FetchData {
         return resultsList;
     }
 
+    public static <T> T getBestImage(List<T> inputList) {
+        if (inputList == null || inputList.isEmpty()) {
+            return null; // or throw an exception, depending on your use case
+        }
+        return inputList.get(inputList.size() - 1);
+    }
 }

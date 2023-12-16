@@ -26,33 +26,39 @@ allprojects {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
 
     compileOptions {
+        // Flag to enable support for the new language APIs
         coreLibraryDesugaringEnabled true
 
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+        encoding 'utf-8'
     }
+//
+//    kotlinOptions {
+//        jvmTarget = JavaVersion.VERSION_1_8
+//    }
 
     defaultConfig {
-        minSdkVersion 22
-        multiDexEnabled true
+        minSdk 21
+        targetSdk 33
     }
 
     dependencies {
         // Comment this if you're building Release, this is for Android Studio indexing
-        // api "io.flutter:flutter_embedding_debug:1.0.0-d4453f601890ec682bbf8f5659b70f15cce1d67d"
-        coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.1'
+        // api "io.flutter:flutter_embedding_debug:1.0.0-d4453f601890ec682bbf8f5659b70f15cce1d67d
+        coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.0'
         implementation 'androidx.annotation:annotation:1.5.0'
-        implementation 'com.github.teamnewpipe:NewPipeExtractor:v0.22.7'
-        implementation 'org.jsoup:jsoup:1.13.1'
-        implementation 'org.mozilla:rhino:1.7.12'
-        implementation 'com.github.spotbugs:spotbugs-annotations:4.0.2'
+        implementation 'com.github.teamnewpipe:NewPipeExtractor:91419ec6e8388081bd6a8c1e67686662e29a6687'
+        implementation 'org.jsoup:jsoup:1.16.2'
+        implementation 'org.mozilla:rhino:1.7.14'
+        implementation 'com.github.spotbugs:spotbugs-annotations:4.8.0'
         implementation 'org.nibor.autolink:autolink:0.10.0'
-        implementation 'junit:junit:4.13.1'
-        implementation "com.squareup.okhttp3:okhttp:3.12.13"
-        implementation 'com.google.code.gson:gson:2.8.6'
+        implementation 'junit:junit:4.13.2'
+        implementation "com.squareup.okhttp3:okhttp:3.14.9"
+        implementation 'com.google.code.gson:gson:2.8.9'
     }
 
     testOptions {

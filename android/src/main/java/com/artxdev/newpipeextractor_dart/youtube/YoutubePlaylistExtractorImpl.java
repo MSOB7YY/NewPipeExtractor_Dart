@@ -34,15 +34,15 @@ public class YoutubePlaylistExtractorImpl {
         if (extractor != null) {
             extractor.fetchPage();
             playlistDetails.put("name", extractor.getName());
-            playlistDetails.put("thumbnailUrl", extractor.getThumbnailUrl());
-            playlistDetails.put("bannerUrl", extractor.getBannerUrl());
+            playlistDetails.put("thumbnailUrl", FetchData.getBestImage(extractor.getThumbnails()).getUrl());
+            playlistDetails.put("bannerUrl", FetchData.getBestImage(extractor.getBanners()).getUrl());
             try {
                 playlistDetails.put("uploaderName", extractor.getUploaderName());
             } catch (final Exception e) {
                 playlistDetails.put("uploaderName", "Unknown");
             }
             try {
-                playlistDetails.put("uploaderAvatarUrl", extractor.getUploaderAvatarUrl());
+                playlistDetails.put("uploaderAvatarUrl", FetchData.getBestImage(extractor.getThumbnails()).getUrl());
             } catch (final Exception e) {
                 playlistDetails.put("uploaderAvatarUrl", null);
             }
