@@ -9,7 +9,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.0'
+        classpath 'com.android.tools.build:gradle:7.4.0'
     }
 }
 
@@ -36,14 +36,14 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 22
+        minSdkVersion 21
         multiDexEnabled true
     }
 
     dependencies {
         // Comment this if you're building Release, this is for Android Studio indexing
         // api "io.flutter:flutter_embedding_debug:1.0.0-d4453f601890ec682bbf8f5659b70f15cce1d67d"
-        coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.1'
+        coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs_nio:2.0.3'
         implementation 'androidx.annotation:annotation:1.5.0'
         implementation 'com.github.teamnewpipe:NewPipeExtractor:v0.22.7'
         implementation 'org.jsoup:jsoup:1.13.1'

@@ -21,12 +21,12 @@ public class YoutubeChannelExtractorImpl {
         extractor = (YoutubeChannelExtractor) YouTube.getChannelExtractor(url);
         extractor.fetchPage();
         final Map<String, String> channelMap = new HashMap<String, String>();
-        // channelMap.put("url", extractor.getUrl());
+        channelMap.put("url", extractor.getUrl());
         channelMap.put("avatarUrl", extractor.getAvatarUrl());
         channelMap.put("bannerUrl", extractor.getBannerUrl());
         channelMap.put("description", extractor.getDescription());
-        // channelMap.put("feedUrl", extractor.getFeedUrl());
-        // channelMap.put("id", extractor.getId());
+        channelMap.put("feedUrl", extractor.getFeedUrl());
+        channelMap.put("id", extractor.getId());
         channelMap.put("name", extractor.getName());
         channelMap.put("subscriberCount", String.valueOf(extractor.getSubscriberCount()));
         channelMap.put("isVerified", String.valueOf(extractor.isVerified()));
